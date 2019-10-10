@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <report version="5.0">
 	<head>
 		<property name="type">0</property>
@@ -11,7 +11,7 @@
        p.first_page_submit_user_id,
        p.first_page_submit_date,
        p.first_page_print_date,
-       t.name,
+       t.name name,	
        p.patient_id,
        p.visit_id,
        p.bed_label,
