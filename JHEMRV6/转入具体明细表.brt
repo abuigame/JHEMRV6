@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[转出具体明细表]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.patient_id,
+       t1.name,
+       (select dept_name from dept_dict a where a.dept_code=t.dept_admission_to) dept_admission_to,
+       (select dept_name from dept_dict a where a.dept_code=t.dept_discharge_from) dept_discharge_from,
+       t.admission_date_time,
+       t2.caption_date_time,
+       t.discharge_date_time
+  from pat_visit t, pat_master_index t1, jhmr_file_index t2
+ where t.patient_id = t1.patient_id
+   and t.patient_id = t2.patient_id
+   and t.visit_id = t2.visit_id
+   and t2.dept_code in ('894', '1588', '1796')
+   and t2.mr_class = 'EMR10.00.06'
+   and t2.topic = '转入记录'
+   and t.discharge_date_time>=?
+   and t.discharge_date_time<?+1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2019-01-01</property>
+				<property name="desc">开始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2019-01-31</property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+				<property name="margin-left">15</property>
+				<property name="margin-right">15</property>
+				<property name="margin-top">20</property>
+				<property name="margin-bottom">20</property>
+			</page>
+			<grid row="5" col="7">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">34</property>
+					</row>
+					<row id="2">
+						<property name="type">2</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+						<property name="width">115</property>
+					</column>
+					<column id="4">
+						<property name="width">107</property>
+					</column>
+					<column id="5">
+						<property name="width">80</property>
+					</column>
+					<column id="6">
+						<property name="width">156</property>
+					</column>
+					<column id="7">
+						<property name="width">80</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="7" >
+						<property name="value"><![CDATA[转入具体明细表]]></property>
+						<property name="font-size">18</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="7" >
+						<property name="value"><![CDATA[='出院时间：'+tostr(@start_time)+'至'+tostr(@end_time)]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[住院号]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[姓名]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[入院科室]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[出院科室]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[入院时间]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[转入时间]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[出院时间]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(PATIENT_ID)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(DEPT_ADMISSION_TO)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(DEPT_DISCHARGE_FROM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds.select(ADMISSION_DATE_TIME)]]></property>
+						<property name="view-format">4|yyyy-M-d</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=ds.select(CAPTION_DATE_TIME)]]></property>
+						<property name="view-format">5|yyyy-M-d H:mm:ss</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=ds.select(DISCHARGE_DATE_TIME)]]></property>
+						<property name="view-format">4|yyyy-M-d</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

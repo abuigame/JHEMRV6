@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病案首页提交统计比率]]></name>
+		<dataSets>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.dept_name,
+       nvl(t2.提交人数, 0) 提交人数,
+       nvl(t3.未提交人数, 0) 未提交人数,
+       nvl(t4.提交人数, 0) 提交人数72,
+       nvl(t5.未提交人数, 0) 未提交人数72,
+       nvl(t6.提交人数, 0) 提交人数48,
+       nvl(t7.未提交人数, 0) 未提交人数48
+  from dept_dict t1
+  left join (select dept_discharge_from,
+                    nvl(decode(提交状态, '按时提交', count(*)), 0) as 提交人数
+               from (select t.patient_id,
+                            t.dept_discharge_from,
+                            case
+                              when (t.first_page_submit_date -
+                                   t.discharge_date_time) * 24 -
+                                   (select count(*)
+                                      from jhmr_mrreceivesignholiday t
+                                     where t.holidaydate between
+                                           (discharge_date_time-1) and
+                                           first_page_submit_date) * 24 < 24 then
+                               '按时提交'
+                              else
+                               '未提交'
+                            end as 提交状态
+                       from pat_visit t
+                      where t.discharge_date_time is not null
+                        and t.first_page_submit_date is not null
+                        and t.discharge_date_time between ? and ? +1) a
+              where a.提交状态 = '按时提交'
+              group by 提交状态, dept_discharge_from) t2
+    on t1.dept_code = t2.dept_discharge_from
+  left join (select dept_discharge_from,
+                    nvl(decode(提交状态, '未提交', count(*)), 0) as 未提交人数
+               from (select t.patient_id,
+                            t.dept_discharge_from,
+                            case
+                              when (t.first_page_submit_date -
+                                   t.discharge_date_time) * 24 -
+                                   (select count(*)
+                                      from jhmr_mrreceivesignholiday t
+                                     where t.holidaydate between
+                                           (discharge_date_time-1) and
+                                           first_page_submit_date) * 24 < 24 then
+                               '按时提交'
+                              else
+                               '未提交'
+                            end as 提交状态
+                       from pat_visit t
+                      where t.discharge_date_time is not null
+                        and t.first_page_submit_date is not null
+                        and t.discharge_date_time between ? and ? +1) b
+              where b.提交状态 = '未提交'
+              group by 提交状态, dept_discharge_from) t3
+    on t1.dept_code = t3.dept_discharge_from
+  left join (select dept_discharge_from,
+                    nvl(decode(提交状态, '按时提交', count(*)), 0) as 提交人数
+               from (select t.patient_id,
+                            t.dept_discharge_from,
+                            case
+                              when (t.first_page_submit_date -
+                                   t.discharge_date_time) * 24 -
+                                   (select count(*)
+                                      from jhmr_mrreceivesignholiday t
+                                     where t.holidaydate between
+                                           (discharge_date_time-1) and
+                                           first_page_submit_date) * 24 < 72 then
+                               '按时提交'
+                              else
+                               '未提交'
+                            end as 提交状态
+                       from pat_visit t
+                      where t.discharge_date_time is not null
+                        and t.first_page_submit_date is not null
+                        and t.discharge_date_time between ? and ? +1) a
+              where a.提交状态 = '按时提交'
+              group by 提交状态, dept_discharge_from) t4
+    on t1.dept_code = t4.dept_discharge_from
+  left join (select dept_discharge_from,
+                    nvl(decode(提交状态, '未提交', count(*)), 0) as 未提交人数
+               from (select t.patient_id,
+                            t.dept_discharge_from,
+                            case
+                              when (t.first_page_submit_date -
+                                   t.discharge_date_time) * 24 -
+                                   (select count(*)
+                                      from jhmr_mrreceivesignholiday t
+                                     where t.holidaydate between
+                                           (discharge_date_time-1) and
+                                           first_page_submit_date) * 24 < 72 then
+                               '按时提交'
+                              else
+                               '未提交'
+                            end as 提交状态
+                       from pat_visit t
+                      where t.discharge_date_time is not null
+                        and t.first_page_submit_date is not null
+                        and t.discharge_date_time between ? and ? +1) b
+              where b.提交状态 = '未提交'
+              group by 提交状态, dept_discharge_from) t5
+    on t1.dept_code = t5.dept_discharge_from
+  left join (select dept_discharge_from,
+                    nvl(decode(提交状态, '按时提交', count(*)), 0) as 提交人数
+               from (select t.patient_id,
+                            t.dept_discharge_from,
+                            case
+                              when (t.first_page_submit_date -
+                                   t.discharge_date_time) * 24 -
+                                   (select count(*)
+                                      from jhmr_mrreceivesignholiday t
+                                     where t.holidaydate between
+                                           (discharge_date_time-1) and
+                                           first_page_submit_date) * 24 < 48 then
+                               '按时提交'
+                              else
+                               '未提交'
+                            end as 提交状态
+                       from pat_visit t
+                      where t.discharge_date_time is not null
+                        and t.first_page_submit_date is not null
+                        and t.discharge_date_time between ? and ? +1) a
+              where a.提交状态 = '按时提交'
+              group by 提交状态, dept_discharge_from) t6
+    on t1.dept_code = t6.dept_discharge_from
+  left join (select dept_discharge_from,
+                    nvl(decode(提交状态, '未提交', count(*)), 0) as 未提交人数
+               from (select t.patient_id,
+                            t.dept_discharge_from,
+                            case
+                              when (t.first_page_submit_date -
+                                   t.discharge_date_time) * 24 -
+                                   (select count(*)
+                                      from jhmr_mrreceivesignholiday t
+                                     where t.holidaydate between
+                                           (discharge_date_time-1) and
+                                           first_page_submit_date) * 24 < 48 then
+                               '按时提交'
+                              else
+                               '未提交'
+                            end as 提交状态
+                       from pat_visit t
+                      where t.discharge_date_time is not null
+                        and t.first_page_submit_date is not null
+                        and t.discharge_date_time between ? and ? +1) b
+              where b.提交状态 = '未提交'
+              group by 提交状态, dept_discharge_from) t7
+    on t1.dept_code = t7.dept_discharge_from
+ where t1.dept_emr = 1
+ 
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+			<dataSet name="ds2" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.dept_name,nvl(t2.提交人数,0) 提交人数,nvl(t3.未提交人数,0) 未提交人数 from dept_dict t1  left join 
+  (select  dept_discharge_from,
+       nvl(decode(提交状态, '按时提交', count(*)),0) as 提交人数
+  from (select t.patient_id,
+               t.dept_discharge_from,
+               case
+                 when (t.first_page_submit_date - t.discharge_date_time) * 24 < 48 then
+                  '按时提交'
+                 else
+                  '未提交'
+               end as 提交状态
+          from pat_visit t
+         where  t.discharge_date_time is not null and t.discharge_date_time between ? and ?)  a  where a.提交状态='按时提交'
+ group by 提交状态, dept_discharge_from) t2  on t1.dept_code=t2.dept_discharge_from left join (select dept_discharge_from,
+       nvl(decode(提交状态, '未提交', count(*)),0) as 未提交人数
+  from (select t.patient_id,
+               t.dept_discharge_from,
+               case
+                 when (t.first_page_submit_date - t.discharge_date_time) * 24 < 48 then
+                  '按时提交'
+                 else
+                  '未提交'
+               end as 提交状态
+          from pat_visit t
+         where  t.discharge_date_time is not null  and t.discharge_date_time between ? and ?) b  where b.提交状态='未提交'
+ group by 提交状态, dept_discharge_from) t3 on t1.dept_code=t3.dept_discharge_from where t1.dept_emr=1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+			<dataSet name="ds3" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.dept_name,nvl(t2.提交人数,0) 提交人数,nvl(t3.未提交人数,0) 未提交人数 from dept_dict t1  left join 
+  (select  dept_discharge_from,
+       nvl(decode(提交状态, '按时提交', count(*)),0) as 提交人数
+  from (select t.patient_id,
+               t.dept_discharge_from,
+               case
+                 when (t.first_page_submit_date - t.discharge_date_time) * 24 < 72 then
+                  '按时提交'
+                 else
+                  '未提交'
+               end as 提交状态
+          from pat_visit t
+         where  t.discharge_date_time is not null and t.discharge_date_time between ? and ?)  a  where a.提交状态='按时提交'
+ group by 提交状态, dept_discharge_from) t2  on t1.dept_code=t2.dept_discharge_from left join (select dept_discharge_from,
+       nvl(decode(提交状态, '未提交', count(*)),0) as 未提交人数
+  from (select t.patient_id,
+               t.dept_discharge_from,
+               case
+                 when (t.first_page_submit_date - t.discharge_date_time) * 24 < 72 then
+                  '按时提交'
+                 else
+                  '未提交'
+               end as 提交状态
+          from pat_visit t
+         where  t.discharge_date_time is not null  and t.discharge_date_time between ? and ?) b  where b.提交状态='未提交'
+ group by 提交状态, dept_discharge_from) t3 on t1.dept_code=t3.dept_discharge_from where t1.dept_emr=1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-03-01</property>
+				<property name="desc">出院时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-03-31</property>
+				<property name="desc">出院日期结束</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="1" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_date" label="出院时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">30</property>
+				<property name="pageColNum">14</property>
+				<property name="pageDirection">0</property>
+				<property name="margin-left">5</property>
+				<property name="margin-right">5</property>
+				<property name="margin-top">5</property>
+				<property name="margin-bottom">5</property>
+				<property name="printScale">2</property>
+			</page>
+			<grid row="12" col="14">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+						<property name="height">24</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">144</property>
+					</column>
+					<column id="2">
+						<property name="width">98</property>
+					</column>
+					<column id="3">
+						<property name="width">66</property>
+					</column>
+					<column id="4">
+					</column>
+					<column id="5">
+						<property name="width">66</property>
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+					</column>
+					<column id="11">
+					</column>
+					<column id="12">
+					</column>
+					<column id="13">
+					</column>
+					<column id="14">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="14" >
+						<property name="value"><![CDATA[安徽省立医院（总院）]]></property>
+						<property name="font-size">16</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="14" >
+						<property name="value"><![CDATA[=tostr(year(@start_date))+'年'+tostr(month(@start_date))+'月'+tostr(day(@start_date))+'日至'+tostr(year(@end_date))+'年'+tostr(month(@end_date))+'月'+tostr(day(@end_date))+'日'+'提交首页统计']]></property>
+						<property name="font-size">14</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" rowspan="2" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[出院总人数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" colspan="2" >
+						<property name="value"><![CDATA[24小时提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" colspan="2" >
+						<property name="value"><![CDATA[24小时未提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" colspan="2" >
+						<property name="value"><![CDATA[48小时提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" colspan="2" >
+						<property name="value"><![CDATA[48小时未提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" colspan="2" >
+						<property name="value"><![CDATA[72小时提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,13" type="0" colspan="2" >
+						<property name="value"><![CDATA[72小时未提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,12" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,13" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,14" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=ds1.select(DEPT_NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="merge-same">1</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=sum(C5+E5)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=ds1.select(提交人数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=(C5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=ds1.select(未提交人数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<property name="value"><![CDATA[=(E5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,7" type="0" >
+						<property name="value"><![CDATA[=ds1.select(提交人数48)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,8" type="0" >
+						<property name="value"><![CDATA[=(G5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,9" type="0" >
+						<property name="value"><![CDATA[=ds1.select(未提交人数48)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,10" type="0" >
+						<property name="value"><![CDATA[=(I5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,11" type="0" >
+						<property name="value"><![CDATA[=ds1.select(提交人数72)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,12" type="0" >
+						<property name="value"><![CDATA[=(K5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,13" type="0" >
+						<property name="value"><![CDATA[=ds1.select(未提交人数72)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,14" type="0" >
+						<property name="value"><![CDATA[=(M5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,7" type="0" >
+					</cell>
+					<cell id="6,8" type="0" >
+					</cell>
+					<cell id="6,9" type="0" >
+					</cell>
+					<cell id="6,10" type="0" >
+					</cell>
+					<cell id="6,11" type="0" >
+					</cell>
+					<cell id="6,12" type="0" >
+					</cell>
+					<cell id="6,13" type="0" >
+					</cell>
+					<cell id="6,14" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="7,7" type="0" >
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+					<cell id="7,9" type="0" >
+					</cell>
+					<cell id="7,10" type="0" >
+					</cell>
+					<cell id="7,11" type="0" >
+					</cell>
+					<cell id="7,12" type="0" >
+					</cell>
+					<cell id="7,13" type="0" >
+					</cell>
+					<cell id="7,14" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+					<cell id="8,8" type="0" >
+					</cell>
+					<cell id="8,9" type="0" >
+					</cell>
+					<cell id="8,10" type="0" >
+					</cell>
+					<cell id="8,11" type="0" >
+					</cell>
+					<cell id="8,12" type="0" >
+					</cell>
+					<cell id="8,13" type="0" >
+					</cell>
+					<cell id="8,14" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="9,5" type="0" >
+					</cell>
+					<cell id="9,6" type="0" >
+					</cell>
+					<cell id="9,7" type="0" >
+					</cell>
+					<cell id="9,8" type="0" >
+					</cell>
+					<cell id="9,9" type="0" >
+					</cell>
+					<cell id="9,10" type="0" >
+					</cell>
+					<cell id="9,11" type="0" >
+					</cell>
+					<cell id="9,12" type="0" >
+					</cell>
+					<cell id="9,13" type="0" >
+					</cell>
+					<cell id="9,14" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="10,7" type="0" >
+					</cell>
+					<cell id="10,8" type="0" >
+					</cell>
+					<cell id="10,9" type="0" >
+					</cell>
+					<cell id="10,10" type="0" >
+					</cell>
+					<cell id="10,11" type="0" >
+					</cell>
+					<cell id="10,12" type="0" >
+					</cell>
+					<cell id="10,13" type="0" >
+					</cell>
+					<cell id="10,14" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+					<cell id="11,5" type="0" >
+					</cell>
+					<cell id="11,6" type="0" >
+					</cell>
+					<cell id="11,7" type="0" >
+					</cell>
+					<cell id="11,8" type="0" >
+					</cell>
+					<cell id="11,9" type="0" >
+					</cell>
+					<cell id="11,10" type="0" >
+					</cell>
+					<cell id="11,11" type="0" >
+					</cell>
+					<cell id="11,12" type="0" >
+					</cell>
+					<cell id="11,13" type="0" >
+					</cell>
+					<cell id="11,14" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+					<cell id="12,7" type="0" >
+					</cell>
+					<cell id="12,8" type="0" >
+					</cell>
+					<cell id="12,9" type="0" >
+					</cell>
+					<cell id="12,10" type="0" >
+					</cell>
+					<cell id="12,11" type="0" >
+					</cell>
+					<cell id="12,12" type="0" >
+					</cell>
+					<cell id="12,13" type="0" >
+					</cell>
+					<cell id="12,14" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

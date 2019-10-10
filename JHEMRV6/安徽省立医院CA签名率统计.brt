@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[安徽省立医院CA签名率统计]]></name>
+		<dataSets>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select max(dept_dict.dept_name) as name,
+       jhmr_file_index.dept_code,
+       count(jhmr_file_index.patient_id) as file_count
+  from jhmr_file_index, dept_dict
+ where jhmr_file_index.dept_code = dept_dict.dept_code
+   and jhmr_file_index.create_date_time >=?
+   and jhmr_file_index.create_date_time <?+1
+   and jhmr_file_index.file_flag <> 'T'
+   and jhmr_file_index.delete_flag <> 1
+   and jhmr_file_index.dept_code in
+       (select distinct jhmr_file_ca_index.dept_code
+          from jhmr_file_ca_index
+         where jhmr_file_ca_index.sign_date_time >=?    
+           and jhmr_file_ca_index.sign_date_time <?+1)
+ group by jhmr_file_index.dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds2" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select max(dept_dict.dept_name) as name,
+       jhmr_file_ca_index.dept_code,
+       count(jhmr_file_ca_index.patient_id) as file_count
+  from jhmr_file_ca_index, dept_dict
+ where jhmr_file_ca_index.dept_code = dept_dict.dept_code
+   and jhmr_file_ca_index.sign_date_time >=?
+   and jhmr_file_ca_index.sign_date_time <?+1
+ group by jhmr_file_ca_index.dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="hosptial" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select hospital from hospital_config where hospital_no<> '00000000']]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2019-01-01</property>
+				<property name="desc">开始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2019-03-01</property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="1" col="4">
+				<rows>
+				<rc idx="1"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				<rc idx="3"  size="150" />
+				<rc idx="4"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="开始时间2019-01-01">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="结束时间2019-01-10">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="3" af="0" >
+					</cell>
+					<cell r="1" c="4" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+			</page>
+			<grid row="12" col="8">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">2</property>
+					</row>
+					<row id="2">
+						<property name="type">2</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+						<property name="type">2</property>
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">91</property>
+					</column>
+					<column id="2">
+						<property name="width">92</property>
+					</column>
+					<column id="3">
+						<property name="width">138</property>
+					</column>
+					<column id="4">
+						<property name="width">102</property>
+					</column>
+					<column id="5">
+						<property name="width">221</property>
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="5" >
+						<property name="value"><![CDATA[安徽省立医院]]></property>
+						<property name="font-size">16</property>
+						<property name="bold">0</property>
+						<border type="0">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,6" type="0" >
+					</cell>
+					<cell id="1,7" type="0" >
+					</cell>
+					<cell id="1,8" type="0" >
+					</cell>
+					<cell id="2,1" type="0" colspan="5" >
+						<property name="value"><![CDATA[CA签名率统计表]]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+					</cell>
+					<cell id="2,7" type="0" >
+					</cell>
+					<cell id="2,8" type="0" >
+					</cell>
+					<cell id="3,1" type="0" colspan="5" >
+						<property name="value"><![CDATA[='签名时间：'+tostr(@start_time)+'至'+tostr(@end_time)]]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+					</cell>
+					<cell id="3,7" type="0" >
+					</cell>
+					<cell id="3,8" type="0" >
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[签名文书总量]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[CA签名文书数量]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[文书CA签名率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[文书CA签名率百分比]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+					</cell>
+					<cell id="4,7" type="0" >
+					</cell>
+					<cell id="4,8" type="0" >
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=ds1.select(NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=ds1.select(FILE_COUNT)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=ds2.select(FILE_COUNT,false,ds2.dEPT_CODE=ds1.DEPT_CODE,false)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=C5{}/B5{}]]></property>
+						<property name="view-format">1|###0.##%;-###0.##%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=C5{}/B5{}]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+					<cell id="5,8" type="0" >
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="6,5" type="0" >
+					</cell>
+					<cell id="6,6" type="0" >
+					</cell>
+					<cell id="6,7" type="0" >
+					</cell>
+					<cell id="6,8" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="7,7" type="0" >
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+					<cell id="8,8" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="9,5" type="0" >
+					</cell>
+					<cell id="9,6" type="0" >
+					</cell>
+					<cell id="9,7" type="0" >
+					</cell>
+					<cell id="9,8" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="10,7" type="0" >
+					</cell>
+					<cell id="10,8" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+					<cell id="11,5" type="0" >
+					</cell>
+					<cell id="11,6" type="0" >
+					</cell>
+					<cell id="11,7" type="0" >
+					</cell>
+					<cell id="11,8" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+					<cell id="12,7" type="0" >
+					</cell>
+					<cell id="12,8" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

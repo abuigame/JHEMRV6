@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="GBK" ?>
+<report version="3.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[?????]]></name>
+		<dataSets>
+			<dataSet name="thrfm" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select p.patient_id,
+       p.visit_id,
+       p.dept_admission_to,
+       p.dept_discharge_from,
+       t.dept_name
+  from diag_comparing d, pat_visit p, dept_dict t
+ where d.patient_id = p.patient_id
+   and d.visit_id = p.visit_id
+   and p.dept_admission_to = t.dept_code
+   and d.diag_compare_group = 2
+   and (d.diag_correspondence = 1 or d.diag_correspondence = 0)
+   and p.admission_date_time >= ?
+   and p.admission_date_time <= ?
+ order by t.dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[ select b.dept_name,count(*) as clnt,dept_code
+  from  dept_dict b,pat_visit c
+ where b.dept_code=c.dept_admission_to
+   and c.admission_date_time>=?
+   and c.admission_date_time <=?
+group by b.dept_name,dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds2" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_admission_to,count(patient_id) as sumpat from pat_visit t  
+where  t.diagnosis_date-t.admission_date_time<=3
+and t.admission_date_time>=?
+and t.admission_date_time<?+1
+group by t.dept_admission_to]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select hospital from hospital_config where hospital_no<> '00000000']]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2010-01-01</property>
+				<property name="desc">start_time</property>
+				<property name="source">0</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2050-01-01</property>
+				<property name="desc">end_time</property>
+				<property name="source">0</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<subReports/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="margin-top">15</property>
+				<property name="margin-bottom">15</property>
+				<property name="printFringe"><![CDATA[<pageheader><font name="??" size="10" color="0,0,0" /><content><footerRight>?@PAGE_NUMBER?/?@PAGE_COUNT?</footerRight></content></pageheader>]]></property>
+			</page>
+			<grid row="6" col="6">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">33</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">30</property>
+					</row>
+					<row id="3">
+						<property name="type">1</property>
+					</row>
+					<row id="4">
+						<property name="type">2</property>
+						<property name="height">52</property>
+					</row>
+					<row id="5">
+						<property name="height">45</property>
+					</row>
+					<row id="6">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="visible"><![CDATA[1]]></property>
+					</column>
+					<column id="2">
+						<property name="width">135</property>
+					</column>
+					<column id="3">
+						<property name="width">152</property>
+					</column>
+					<column id="4">
+						<property name="width">115</property>
+					</column>
+					<column id="5">
+						<property name="width">169</property>
+					</column>
+					<column id="6">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="5" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">16</property>
+					</cell>
+					<cell id="1,6" type="0" >
+					</cell>
+					<cell id="2,1" type="0" colspan="5" >
+						<property name="value"><![CDATA[三日确诊率]]></property>
+						<property name="font-size">18</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,6" type="0" >
+					</cell>
+					<cell id="3,1" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" colspan="4" >
+						<property name="value"><![CDATA[="检查时间"+tostr(@start_time)+"至"+tostr(@end_time)]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[科室编码]]></property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[总数]]></property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[符合确诊]]></property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[三日确诊率]]></property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=ds1.select(DEPT_CODE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=ds1.select(DEPT_NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=ds1.select(CLNT)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=ds2.getone(ds2.sUMPAT,ds2.dEPT_ADMISSION_TO=A5)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=D5/C5]]></property>
+						<property name="view-format">1|###0.00%;-###0.00%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+						<property name="value"><![CDATA[合计:]]></property>
+					</cell>
+					<cell id="6,3" type="0" >
+						<property name="value"><![CDATA[=sum(C5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+					</cell>
+					<cell id="6,4" type="0" >
+						<property name="value"><![CDATA[=sum(D5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+					</cell>
+					<cell id="6,5" type="0" >
+						<property name="value"><![CDATA[=D6/C6]]></property>
+						<property name="view-format">1|###0.00%;-###0.00%</property>
+					</cell>
+					<cell id="6,6" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+	<param-form col="2">
+		<ctrl id="start_time" type="1" ctrlType="3" label="入院日期">
+		</ctrl>
+		<ctrl id="end_time" type="1" ctrlType="3" label="至">
+		</ctrl>
+	</param-form>
+</report>

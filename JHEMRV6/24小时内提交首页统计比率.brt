@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[24小时内提交首页统计]]></name>
+		<dataSets>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[
+select (select dept_name from dept_dict where dept_code=dept_discharge_from) as dept_discharge_from,
+       nvl(decode(提交状态, '未提交', count(*))，0) as 未提交人数,
+       nvl(decode(提交状态, '按时提交', count(*)),0) as 提交人数
+  from (select t.patient_id,
+               t.dept_discharge_from,
+               case
+                 when (t.first_page_submit_date - t.discharge_date_time) * 24 < 24 then
+                  '按时提交'
+                 else
+                  '未提交'
+               end as 提交状态
+          from pat_visit t
+         where t.MR_DOCTOR_PART_STATUS <= 3
+           and t.discharge_date_time is not null
+           and t.dept_discharge_from in (select d.dept_code from dept_dict d where d.dept_name not like '%南区%')
+           and t.discharge_date_time between ? and ?)
+ group by 提交状态, dept_discharge_from]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-03-01</property>
+				<property name="desc">出院时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-03-31</property>
+				<property name="desc">出院日期结束</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="1" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_date" label="出院时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageColNum">8</property>
+			</page>
+			<grid row="12" col="6">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+						<property name="height">24</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">213</property>
+					</column>
+					<column id="2">
+						<property name="width">98</property>
+					</column>
+					<column id="3">
+						<property name="width">66</property>
+					</column>
+					<column id="4">
+					</column>
+					<column id="5">
+						<property name="width">66</property>
+					</column>
+					<column id="6">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="6" >
+						<property name="value"><![CDATA[安徽省立医院（总院）]]></property>
+						<property name="font-size">16</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="6" >
+						<property name="value"><![CDATA[=tostr(year(@start_date))+'年'+tostr(month(@start_date))+'月'+tostr(day(@start_date))+'日'+'24小时内提交首页统计']]></property>
+						<property name="font-size">14</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" rowspan="2" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[出院总人数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" colspan="2" >
+						<property name="value"><![CDATA[24小时提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" colspan="2" >
+						<property name="value"><![CDATA[24小时未提交情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=ds1.select(DEPT_DISCHARGE_FROM)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="merge-same">1</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=sum(C5()+E5())]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=ds1.select(提交人数)]]></property>
+						<property name="view-format">5|yyyy-M-d H:mm:ss</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=(C5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=ds1.select(未提交人数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<property name="value"><![CDATA[=(E5()/B5())]]></property>
+						<property name="view-format">1|###0%;-###0%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="9,5" type="0" >
+					</cell>
+					<cell id="9,6" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+					<cell id="11,5" type="0" >
+					</cell>
+					<cell id="11,6" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

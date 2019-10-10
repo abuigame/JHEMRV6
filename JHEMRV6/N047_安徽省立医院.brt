@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[N047_安徽省立医院]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select *
+  from v_产妇分娩信息 t
+ where to_date(t.cf_fmrq,'yyyy-MM-dd hh24:mi') >= ?
+ and  to_date(t.cf_fmrq,'yyyy-MM-dd hh24:mi')  <= ?]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">开始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">50</property>
+				<property name="pageDirection">0</property>
+			</page>
+			<grid row="2" col="41">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">2</property>
+					</row>
+					<row id="2">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+						<property name="width">179</property>
+					</column>
+					<column id="4">
+					</column>
+					<column id="5">
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+					</column>
+					<column id="11">
+					</column>
+					<column id="12">
+					</column>
+					<column id="13">
+					</column>
+					<column id="14">
+					</column>
+					<column id="15">
+					</column>
+					<column id="16">
+					</column>
+					<column id="17">
+					</column>
+					<column id="18">
+					</column>
+					<column id="19">
+					</column>
+					<column id="20">
+					</column>
+					<column id="21">
+					</column>
+					<column id="22">
+					</column>
+					<column id="23">
+					</column>
+					<column id="24">
+					</column>
+					<column id="25">
+					</column>
+					<column id="26">
+					</column>
+					<column id="27">
+					</column>
+					<column id="28">
+						<property name="width">99</property>
+					</column>
+					<column id="29">
+					</column>
+					<column id="30">
+					</column>
+					<column id="31">
+					</column>
+					<column id="32">
+					</column>
+					<column id="33">
+					</column>
+					<column id="34">
+					</column>
+					<column id="35">
+					</column>
+					<column id="36">
+					</column>
+					<column id="37">
+					</column>
+					<column id="38">
+					</column>
+					<column id="39">
+					</column>
+					<column id="40">
+					</column>
+					<column id="41">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" >
+						<property name="value"><![CDATA[CF_XM]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,2" type="0" >
+						<property name="value"><![CDATA[USERNAME]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,3" type="0" >
+						<property name="value"><![CDATA[JG_ZC]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,4" type="0" >
+						<property name="value"><![CDATA[CF_BH]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,5" type="0" >
+						<property name="value"><![CDATA[CF_JDSJ]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,6" type="0" >
+						<property name="value"><![CDATA[CF_BAH]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,7" type="0" >
+						<property name="value"><![CDATA[CF_ZJLX]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,8" type="0" >
+						<property name="value"><![CDATA[CF_ZJHM]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,9" type="0" >
+						<property name="value"><![CDATA[CF_CSRQ]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,10" type="0" >
+						<property name="value"><![CDATA[CF_GJ]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,11" type="0" >
+						<property name="value"><![CDATA[CF_MZ]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,12" type="0" >
+						<property name="value"><![CDATA[CF_HJ_S]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,13" type="0" >
+						<property name="value"><![CDATA[CF_HJ_SD]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,14" type="0" >
+						<property name="value"><![CDATA[CF_HJ_XQ]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,15" type="0" >
+						<property name="value"><![CDATA[CF_HJ_QHDM]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,16" type="0" >
+						<property name="value"><![CDATA[CF_JZD_S]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,17" type="0" >
+						<property name="value"><![CDATA[CF_JZD_SD]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,18" type="0" >
+						<property name="value"><![CDATA[CF_JZD_XQ]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,19" type="0" >
+						<property name="value"><![CDATA[CF_JZ_QHDM]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,20" type="0" >
+						<property name="value"><![CDATA[CF_YC]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,21" type="0" >
+						<property name="value"><![CDATA[CF_CC]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,22" type="0" >
+						<property name="value"><![CDATA[CF_GWRS]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,23" type="0" >
+						<property name="value"><![CDATA[CF_FMDD]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,24" type="0" >
+						<property name="value"><![CDATA[CF_FMFS]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,25" type="0" >
+						<property name="value"><![CDATA[CF_FMRQ]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,26" type="0" >
+						<property name="value"><![CDATA[FM_XB1]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,27" type="0" >
+						<property name="value"><![CDATA[FM_RSJJ1]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,28" type="0" >
+						<property name="value"><![CDATA[FM_PF1]]></property>
+						<property name="size-adjust">3</property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,29" type="0" >
+						<property name="value"><![CDATA[FM_XB2]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,30" type="0" >
+						<property name="value"><![CDATA[FM_RSJJ2]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,31" type="0" >
+						<property name="value"><![CDATA[FM_PF2]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,32" type="0" >
+						<property name="value"><![CDATA[FM_XB3]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,33" type="0" >
+						<property name="value"><![CDATA[FM_RSJJ3]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,34" type="0" >
+						<property name="value"><![CDATA[FM_PF3]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,35" type="0" >
+						<property name="value"><![CDATA[FM_XB4]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,36" type="0" >
+						<property name="value"><![CDATA[FM_RSJJ4]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,37" type="0" >
+						<property name="value"><![CDATA[FM_PF4]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,38" type="0" >
+						<property name="value"><![CDATA[JG_DWFZR]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,39" type="0" >
+						<property name="value"><![CDATA[JG_TBR]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,40" type="0" >
+						<property name="value"><![CDATA[JG_LXDH]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,41" type="0" >
+						<property name="value"><![CDATA[JG_BCRQ]]></property>
+						<border type="0">1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_XM)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(USERNAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(JG_ZC)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_BH)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_JDSJ)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_BAH)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_ZJLX)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,8" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_ZJHM)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_CSRQ)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,10" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_GJ)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,11" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_MZ)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,12" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_HJ_S)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,13" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_HJ_SD)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,14" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_HJ_XQ)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,15" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_HJ_QHDM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,16" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_JZD_S)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,17" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_JZD_SD)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,18" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_JZD_XQ)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,19" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_JZ_QHDM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,20" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_YC)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,21" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_CC)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,22" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_GWYS)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,23" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_FMFS)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,24" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_FMFS)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,25" type="0" >
+						<property name="value"><![CDATA[=ds.select(CF_FMRQ)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,26" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_XB1)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,27" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_RSJJ1)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,28" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_PF1)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,29" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_XB2)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,30" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_RSJJ2)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,31" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_PF2)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,32" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_XB3)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,33" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_RSJJ3)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,34" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_PF3)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,35" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_XB4)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,36" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_RSJJ4)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,37" type="0" >
+						<property name="value"><![CDATA[=ds.select(FM_PF4)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,38" type="0" >
+						<property name="value"><![CDATA[=ds.select(JG_DWFZR)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,39" type="0" >
+						<property name="value"><![CDATA[=ds.select(JG_TBR)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,40" type="0" >
+						<property name="value"><![CDATA[=ds.select(JG_LXDH)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,41" type="0" >
+						<property name="value"><![CDATA[=ds.select(JG_BCRQ)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

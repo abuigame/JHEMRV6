@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[麻醉统计表]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select d.dept_name,uu.user_id,uu.user_name,mz.麻醉数 from users uu left join (
+select u.user_id,u.user_name,count(*) as 麻醉数 from users u left join OPERATION o on u.user_id=o.anesthesia_doctor_id 
+where o.operator is not null  and o.operating_date>? and o.operating_date<? group by (u.user_id,u.user_name）
+) mz on uu.user_id=mz.user_id left join dept_dict d on uu.user_dept=d.dept_code where uu.user_name<>'管理员']]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">起始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">37</property>
+				<property name="printLocation">0</property>
+			</page>
+			<grid row="3" col="4">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="height">38</property>
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">156</property>
+					</column>
+					<column id="2">
+						<property name="width">66</property>
+					</column>
+					<column id="3">
+						<property name="width">100</property>
+					</column>
+					<column id="4">
+						<property name="width">66</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[麻醉统计表]]></property>
+						<property name="font-size">18</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[科 室]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[工 号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="value"><![CDATA[姓 名]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<property name="value"><![CDATA[麻醉数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(DEPT_NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(USER_ID)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(USER_NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(麻醉数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

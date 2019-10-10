@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[医师工作量统计表]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.user_id 医师工号,
+       t.user_name 医师姓名,
+       (select dept_name from dept_dict where dept_code = t.user_dept) as 所在科室,
+       t.education_title 职称,
+       nvl(a1.诊治住院病人人次,0)+nvl(a2.诊治住院病人人次,0)+nvl(a3.诊治住院病人人次,0) 诊治住院病人人次,
+       nvl(b1.危重病人诊治人次,0)+nvl(b2.危重病人诊治人次,0)+nvl(b3.危重病人诊治人次,0) 危重病人诊治人次,
+       nvl(c.抢救次数,0) 抢救次数,
+       nvl(d.查房记录次数,0) 查房记录次数,
+       (select a.hospital
+          from hospital_config a
+         where hospital_no = t.hospital_no) as 所在院区
+  from users t 
+  left join (select doctor,count(1) as 诊治住院病人人次 from (select CHIEF_DOCTOR_ID doctor from pat_visit  where discharge_date_time between ? and ?） group by doctor) a1 on  a1.doctor =t.user_id
+    left join (select doctor,count(1) as 诊治住院病人人次 from (select ATTENDING_DOCTOR_ID doctor from pat_visit where discharge_date_time between ? and ?） group by doctor) a2 on  a2.doctor =t.user_id
+      left join (select doctor,count(1) as 诊治住院病人人次 from (select DOCTOR_IN_CHARGE_ID doctor from pat_visit where discharge_date_time between ? and ?） group by doctor) a3 on  a3.doctor =t.user_id
+  left join (select doctor,count(1) as 危重病人诊治人次 from (select CHIEF_DOCTOR_ID doctor from pat_visit where patient_id in (select distinct(patient_id) from jhcdr_inpat_order where order_text like '%病危%' or order_text like '%病重%') and discharge_date_time between ? and ?） group by doctor) b1 on b1.doctor =t.user_id
+    left join (select doctor,count(1) as 危重病人诊治人次 from (select CHIEF_DOCTOR_ID doctor from pat_visit where patient_id in (select distinct(patient_id) from jhcdr_inpat_order where order_text like '%病危%' or order_text like '%病重%')and discharge_date_time between ? and ? ） group by doctor) b2 on b2.doctor =t.user_id
+      left join (select doctor,count(1) as 危重病人诊治人次 from (select CHIEF_DOCTOR_ID doctor from pat_visit where patient_id in (select distinct(patient_id) from jhcdr_inpat_order where order_text like '%病危%' or order_text like '%病重%') and discharge_date_time between ? and ?） group by doctor) b3 on b3.doctor =t.user_id
+  left join (select creator_id doctor,count(distinct(patient_id)) as 抢救次数 from jhmr_file_index where topic like '%抢救%' and caption_date_time between ? and ? group by creator_id) c on  c.doctor =t.user_id
+  left join (select topic_doctor_id doctor,count(distinct(to_char(t.caption_date_time,'yyyy-MM-dd'))) as 查房记录次数 from jhmr_file_index t where  caption_date_time between ? and ? group by topic_doctor_id) d on  d.doctor =t.user_id
+ where t.education_flag = 1
+   and t.user_type = 0
+ order by t.user_dept, t.education_title]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-04-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-04-30</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="1" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" af="0" >
+					</cell>
+					<cell r="1" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">30</property>
+				<property name="pageDirection">0</property>
+				<property name="margin-left">5</property>
+				<property name="margin-right">5</property>
+				<property name="margin-top">5</property>
+				<property name="margin-bottom">5</property>
+				<property name="printLocation">0</property>
+			</page>
+			<grid row="7" col="10">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">79</property>
+					</column>
+					<column id="2">
+						<property name="width">116</property>
+					</column>
+					<column id="3">
+						<property name="width">75</property>
+					</column>
+					<column id="4">
+						<property name="width">75</property>
+					</column>
+					<column id="5">
+						<property name="width">66</property>
+					</column>
+					<column id="6">
+						<property name="width">104</property>
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="10" >
+						<property name="value"><![CDATA[医师工作指标-安徽省立医院]]></property>
+						<property name="bold">0</property>
+						<border type="0">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" colspan="10" >
+						<property name="value"><![CDATA[=tostr(year(@start_date))+'年'+tostr(month(@start_date))+'月'+tostr(day(@start_date))+'日'+'至'+tostr(year(@end_date))+'年'+tostr(month(@end_date))+'月'+tostr(day(@end_date))+'日']]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[医师工号]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[医师姓名]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[主科室]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[职称]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[诊治住院病人人次]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[危重病人诊治人次]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[抢救次数]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[查房记录次数（总）]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[查房记录次数（周均）]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[所在院区]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(医师工号)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(医师姓名)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(所在科室)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(职称)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds.select(诊治住院病人人次)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=ds.select(危重病人诊治人次)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=ds.select(抢救次数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[=ds.select(查房记录次数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[=ds.select(查房记录次数)/(ceil(datediff(@start_date,@end_date)/7))]]></property>
+						<property name="view-format">1|###0.#;-###0.#</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[=ds.select(所在院区)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,8" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,9" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,10" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,8" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,9" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,10" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,8" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,9" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,10" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

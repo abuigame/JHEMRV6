@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[出院情况统计_XQ]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[
+select (select dept_name
+          from dept_dict
+         where dept_code = dept_discharge_from) dept_discharge_from,
+       count(*) 出院人数,
+       count(case
+               when t.discharge_conditions = '治愈' then
+                1
+               else
+                null
+             end) 治愈数,
+       count(case
+               when t.discharge_conditions = '好转' then
+                1
+               else
+                null
+             end) 好转数,
+       count(case
+               when t.discharge_conditions = '未愈' then
+                1
+               else
+                null
+             end) 未愈数,
+       count(case
+               when t.discharge_conditions = '死亡' then
+                1
+               else
+                null
+             end) 死亡数,
+       count(case
+               when t.discharge_conditions is null then
+                1
+               else
+                null
+             end) 未填
+  from PAT_VISIT P
+  LEFT JOIN DIAGNOSIS t
+    ON p.patient_id = t.patient_id
+    and t.diagnosis_type = 3
+    and t.id = 1
+ where  p.discharge_date_time between ? and ? +1
+   and p.discharge_date_time is not null
+   and (select dept_name from dept_dict where         dept_code=dept_discharge_from) like '%西区%'
+ group by dept_discharge_from
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2016-06-01</property>
+				<property name="desc">开始日期</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2016-06-30</property>
+				<property name="desc">结束日期</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+			</page>
+			<grid row="12" col="12">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+					</column>
+					<column id="4">
+					</column>
+					<column id="5">
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+					</column>
+					<column id="11">
+					</column>
+					<column id="12">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="12" >
+						<property name="value"><![CDATA[=出院情况统计月报表+'('+tostr(year(@start_date))+'年'+tostr(month(@end_date))+'月'+')']]></property>
+						<property name="bold">0</property>
+						<border type="0">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" rowspan="2" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" colspan="2" >
+						<property name="value"><![CDATA[治愈数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" colspan="2" >
+						<property name="value"><![CDATA[好转数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" colspan="2" >
+						<property name="value"><![CDATA[未愈数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" colspan="2" >
+						<property name="value"><![CDATA[死亡数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,11" type="0" colspan="2" >
+						<property name="value"><![CDATA[未填]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[人次]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[人次]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[人次]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[人次]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[人次]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,12" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(DEPT_DISCHARGE_FROM)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(出院人数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(治愈数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=C4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds.select(好转数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=E4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=ds.select(未愈数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[=G4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[=ds.select(死亡数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[=I4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[=ds.select(未填)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,12" type="0" >
+						<property name="value"><![CDATA[=K4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+					<cell id="5,8" type="0" >
+					</cell>
+					<cell id="5,9" type="0" >
+					</cell>
+					<cell id="5,10" type="0" >
+					</cell>
+					<cell id="5,11" type="0" >
+					</cell>
+					<cell id="5,12" type="0" >
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="6,5" type="0" >
+					</cell>
+					<cell id="6,6" type="0" >
+					</cell>
+					<cell id="6,7" type="0" >
+					</cell>
+					<cell id="6,8" type="0" >
+					</cell>
+					<cell id="6,9" type="0" >
+					</cell>
+					<cell id="6,10" type="0" >
+					</cell>
+					<cell id="6,11" type="0" >
+					</cell>
+					<cell id="6,12" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="7,7" type="0" >
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+					<cell id="7,9" type="0" >
+					</cell>
+					<cell id="7,10" type="0" >
+					</cell>
+					<cell id="7,11" type="0" >
+					</cell>
+					<cell id="7,12" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+					<cell id="8,8" type="0" >
+					</cell>
+					<cell id="8,9" type="0" >
+					</cell>
+					<cell id="8,10" type="0" >
+					</cell>
+					<cell id="8,11" type="0" >
+					</cell>
+					<cell id="8,12" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="9,5" type="0" >
+					</cell>
+					<cell id="9,6" type="0" >
+					</cell>
+					<cell id="9,7" type="0" >
+					</cell>
+					<cell id="9,8" type="0" >
+					</cell>
+					<cell id="9,9" type="0" >
+					</cell>
+					<cell id="9,10" type="0" >
+					</cell>
+					<cell id="9,11" type="0" >
+					</cell>
+					<cell id="9,12" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="10,7" type="0" >
+					</cell>
+					<cell id="10,8" type="0" >
+					</cell>
+					<cell id="10,9" type="0" >
+					</cell>
+					<cell id="10,10" type="0" >
+					</cell>
+					<cell id="10,11" type="0" >
+					</cell>
+					<cell id="10,12" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+					<cell id="11,5" type="0" >
+					</cell>
+					<cell id="11,6" type="0" >
+					</cell>
+					<cell id="11,7" type="0" >
+					</cell>
+					<cell id="11,8" type="0" >
+					</cell>
+					<cell id="11,9" type="0" >
+					</cell>
+					<cell id="11,10" type="0" >
+					</cell>
+					<cell id="11,11" type="0" >
+					</cell>
+					<cell id="11,12" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+					<cell id="12,7" type="0" >
+					</cell>
+					<cell id="12,8" type="0" >
+					</cell>
+					<cell id="12,9" type="0" >
+					</cell>
+					<cell id="12,10" type="0" >
+					</cell>
+					<cell id="12,11" type="0" >
+					</cell>
+					<cell id="12,12" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

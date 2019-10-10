@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病案编目工作量统计]]></name>
+		<dataSets>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select a.deptname,
+       a.出院人数,
+       a.编码1天,
+       a.编码2天,
+       a.编码3天,
+       a.编码4天,
+       a.编码5天,
+       a.编码总完成量,
+       m.cataloger
+  from (select (select dept_name
+                  from dept_dict
+                 where dept_code = dept_discharge_from) deptname,
+               t.dept_discharge_from,
+               count(*) 出院人数,
+               count(case
+                       when TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) <= 1 and
+                            TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) >= 0 then
+                        1
+                       else
+                        null
+                     end) 编码1天,
+               count(case
+                       when TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) <= 2 and
+                            TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) >= 0 then
+                        1
+                       else
+                        null
+                     end) 编码2天,
+               count(case
+                       when TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) <= 3 and
+                            TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) >= 0 then
+                        1
+                       else
+                        null
+                     end) 编码3天,
+               count(case
+                       when TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) <= 4 and
+                            TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) >= 0 then
+                        1
+                       else
+                        null
+                     end) 编码4天,
+               count(case
+                       when TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) <= 5 and
+                            TRUNC(t.catalog_date) - TRUNC(t.first_page_submit_date) -
+                            (select count(*)
+                               from jhmr_mrreceivesignholiday t
+                              where t.holidaydate between
+                                    (t.first_page_submit_date - 1) and t.catalog_date) >= 0 then
+                        1
+                       else
+                        null
+                     end) 编码5天,
+               count(case
+                       when TRUNC(t.catalog_date) <>
+                            to_date('1990-01-01', 'yyyy-mm-dd') then
+                        1
+                       else
+                        null
+                     end) 编码总完成量
+          from pat_visit t
+         where t.discharge_date_time is not null
+           and t.discharge_date_time between ? and ? +1
+        /*  and t.catalog_date >
+        to_date('1991-02-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss')*/
+         group by dept_discharge_from
+         order by dept_discharge_from) a
+  left join (select l.dept_discharge_from, l.cataloger
+               from (select r.dept_discharge_from,
+                            r.cataloger,
+                            row_number() over(partition by r.dept_discharge_from order by r.cnt desc) rn
+                       from (select p.dept_discharge_from,
+                                    p.cataloger,
+                                    count(*) as cnt
+                               from pat_visit p
+                              where p.discharge_date_time between ? and ? +1
+                              group by p.dept_discharge_from, p.cataloger) r) l
+              where l.rn = 1
+                and l.cataloger is not null) m
+    on a.dept_discharge_from = m.dept_discharge_from
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="dis_time" />
+				<queryParam name="dis_time2" />
+				<queryParam name="dis_time" />
+				<queryParam name="dis_time2" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="dis_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-02-01</property>
+				<property name="desc">出院时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="dis_time2" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-02-01</property>
+				<property name="desc">出院时间范围</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@dis_time" label="出院时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@dis_time2" label="出院时间范围">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+				<property name="pageDirection">0</property>
+				<property name="printLocation">0</property>
+				<property name="printScale">2</property>
+			</page>
+			<grid row="4" col="10">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+					</row>
+					<row id="2">
+						<property name="type">2</property>
+					</row>
+					<row id="3">
+					</row>
+					<row id="4">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">235</property>
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+						<property name="width">62</property>
+					</column>
+					<column id="4">
+						<property name="width">65</property>
+					</column>
+					<column id="5">
+						<property name="width">65</property>
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+						<property name="width">65</property>
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+						<property name="width">65</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="10" >
+						<property name="value"><![CDATA[=安徽省立医院病案编目工作量统计+'('+tostr(year(@dis_time))+'年'+tostr(month(@dis_time))+'月'+')']]></property>
+						<property name="font-size">12</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="value"><![CDATA[编目≤1天]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<property name="value"><![CDATA[编目≤2天]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<property name="value"><![CDATA[编目≤3天]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<property name="value"><![CDATA[编目≤4天]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" >
+						<property name="value"><![CDATA[编目≤5天]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,8" type="0" >
+						<property name="value"><![CDATA[编码总完成量]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" >
+						<property name="value"><![CDATA[编码率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,10" type="0" >
+						<property name="value"><![CDATA[编码员]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[=ds1.select(DEPTNAME)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="align">0</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[=ds1.select(出院人数)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[=ds1.select(编码1天)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[=ds1.select(编码2天)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[=ds1.select(编码3天)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[=ds1.select(编码4天)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[=ds1.select(编码5天)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[=ds1.select(编码总完成量)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[=H3()/B3()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[=ds1.select(CATALOGER)]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+					</cell>
+					<cell id="4,2" type="0" >
+					</cell>
+					<cell id="4,3" type="0" >
+					</cell>
+					<cell id="4,4" type="0" >
+					</cell>
+					<cell id="4,5" type="0" >
+					</cell>
+					<cell id="4,6" type="0" >
+					</cell>
+					<cell id="4,7" type="0" >
+					</cell>
+					<cell id="4,8" type="0" >
+					</cell>
+					<cell id="4,9" type="0" >
+					</cell>
+					<cell id="4,10" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="GBK" ?>
+<report version="3.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[全院各科室环节病案质量统计表1030]]></name>
+		<dataSets>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select sum(e.ERROR_TOTAL_SCORE) AS ERROR_TOTAL_SCORE,
+       count(p.mr_quality) as QCLNT,
+       g.dept_name,
+       count(e.grading_item_name) AS GCLNT
+  from JHMR_RECTIFICATION t, pat_visit p, JHMR_RECTIFICATION_ITEM e ,DEPT_DICT g
+ where g.dept_code = p.DEPT_DISCHARGE_FROM
+   and t.patient_id = p.patient_id
+   and t.visit_id = p.visit_id
+   and t.RECTIFICATION_UNIQUE_ID = e.RECTIFICATION_UNIQUE_ID
+   and p.mr_quality != '甲'   or  p.mr_quality != '1'
+   and t.RECTIFICATION_DATE_TIME >= ?
+   and t.RECTIFICATION_DATE_TIME <= ?
+   group by g.dept_name]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds2" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select count(*) AS GCV from pat_visit p , JHMR_RECTIFICATION t where  p.discharge_date_time is not null
+ and t.patient_id = p.patient_id
+   and t.visit_id = p.visit_id
+     and t.RECTIFICATION_DATE_TIME >= ?
+   and t.RECTIFICATION_DATE_TIME <= ?]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2011-10-01</property>
+				<property name="desc">开始时间</property>
+				<property name="source">0</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2011-10-10</property>
+				<property name="desc">结束时间</property>
+				<property name="source">0</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<subReports/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">35</property>
+				<property name="margin-left">10</property>
+				<property name="margin-right">10</property>
+				<property name="margin-top">15</property>
+				<property name="margin-bottom">15</property>
+				<property name="printFringe"><![CDATA[<pageheader><font name="宋体" size="10" color="0,0,0" /><content><footerRight>第@PAGE_NUMBER页/共@PAGE_COUNT页</footerRight></content></pageheader>]]></property>
+			</page>
+			<grid row="4" col="6">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">33</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+						<property name="height">26</property>
+					</row>
+					<row id="4">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">119</property>
+					</column>
+					<column id="2">
+						<property name="width">79</property>
+					</column>
+					<column id="3">
+						<property name="width">62</property>
+					</column>
+					<column id="4">
+						<property name="width">85</property>
+					</column>
+					<column id="5">
+					</column>
+					<column id="6">
+						<property name="width">69</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="6" >
+						<property name="value"><![CDATA[全院各科室环节病案质量统计表]]></property>
+						<property name="font-size">12</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="6" >
+						<property name="value"><![CDATA[="检查时间："+tostr(@start_time)+"至"+tostr(@end_time)]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[科室]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[缺陷病例数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[缺陷率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[缺陷条目数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[总病例]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[缺陷扣分]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds1.group(DEPT_name)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds1.select(QCLNT)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=B4/E4]]></property>
+						<property name="view-format">1|###0.00%;-###0.00%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds1.select(GCLNT)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds2.select(GCV)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=ds1.select(ERROR_TOTAL_SCORE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+	<param-form col="2">
+		<ctrl id="start_time" type="1" ctrlType="3" label="统计时间从">
+		</ctrl>
+		<ctrl id="end_time" type="1" ctrlType="3" label="至">
+		</ctrl>
+	</param-form>
+</report>

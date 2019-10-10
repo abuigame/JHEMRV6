@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病历质量得分统计表]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select aaa.user_id,aaa.user_name,ccc.dept_name,bbb.病例数,bbb.总分,bbb.平均分 from users aaa left join (select cc.dept_name as 科室,aa.工号,aa.姓名,aa.病例数,bb.总分,bb.总分/aa.病例数 as 平均分 from (select c.user_dept as 科室,c.user_id as 工号,c.user_name as 姓名,count(*) as 病例数 from(select a.user_name,a.user_dept,a.user_id,a.patient_id,b.mr_score from (select u.user_name,u.user_dept,u.user_id,p.patient_id from USERS u  
+left join pat_visit p on (p.chief_doctor_id=u.user_id or p.attending_doctor_id=u.user_id or p.doctor_in_charge_id=u.user_id) where p.discharge_date_time>? and p.discharge_date_time<?) a left join (select * from JHMR_TERMINAL_SCORE t) b 
+on a.patient_id=b.patient_id) c  group by (c.user_name,c.user_dept,c.user_id)) aa left join (select a.user_dept,a.user_id,sum(b.mr_score) as 总分 from (select u.user_dept,u.user_id,p.patient_id from USERS u  
+left join pat_visit p on (p.chief_doctor_id=u.user_id or p.attending_doctor_id=u.user_id or p.doctor_in_charge_id=u.user_id)) a left join (select * from JHMR_TERMINAL_SCORE t) b 
+on a.patient_id=b.patient_id group by (a.user_dept,a.user_id))bb on aa.工号=bb.user_id left join dept_dict cc on aa.科室=cc.dept_code
+) bbb on aaa.user_id=bbb.工号 left join dept_dict ccc on aaa.user_dept=ccc.dept_code where aaa.user_id<>'000000' and aaa.user_id<>'JHEMR'  and aaa.user_dept in (select dept_code from dept_dict where dept_name like '%西区%') order by ccc.dept_name]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">起始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">42</property>
+				<property name="printLocation">0</property>
+			</page>
+			<grid row="3" col="4">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="height">38</property>
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">156</property>
+					</column>
+					<column id="2">
+						<property name="width">80</property>
+					</column>
+					<column id="3">
+						<property name="width">117</property>
+					</column>
+					<column id="4">
+						<property name="width">119</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[病历质量得分统计表]]></property>
+						<property name="font-size">18</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[科 室]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[工 号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="value"><![CDATA[姓 名]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<property name="value"><![CDATA[病历得分]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(DEPT_NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(USER_ID)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(USER_NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(平均分)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

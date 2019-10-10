@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[出院及死亡人数统计表]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select a.dept_name, nvl(b.cou, 0) cou, b.days, nvl(c.dcou, 0) dcou
+  from dept_dict a
+  left join (select t.dept_discharge_from,
+                    count(1) as cou,
+                    sum( TRUNC(t.discharge_date_time) - TRUNC(t.admission_date_time)) as days
+               from pat_visit t
+              where t.discharge_date_time >=?
+                and t.discharge_date_time < ? +1
+                 and t.bed_label not in ('预约床',' ')
+              group by t.dept_discharge_from) b
+    on a.dept_code = b.dept_discharge_from
+  left join (select t.dept_discharge_from, count(1) as dcou
+               from pat_visit t
+              where (t.DISCHARGE_DISPOSITION = '死亡' or
+                    t.DISCHARGE_DISPOSITION = '5' or
+                    t.patient_id in
+                    (select patient_id
+                        from jhcdr_inpat_order
+                       where order_text like '%死亡%') or
+                    t.patient_id in
+                    (select patient_id
+                        from jhmr_file_index
+                       where topic like '%死亡%'))
+                and t.discharge_date_time >=  ?
+                and t.discharge_date_time < ? +1
+                and t.bed_label not in ('预约床',' ')
+              group by t.dept_discharge_from) c
+    on a.dept_code = c.dept_discharge_from
+ where a.hospital_branch ='1001'
+ order by a.display_order
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-04-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-05-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">30</property>
+				<property name="margin-left">5</property>
+				<property name="margin-right">5</property>
+				<property name="printColNum">2</property>
+			</page>
+			<grid row="11" col="4">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+					</row>
+					<row id="3">
+						<property name="type">1</property>
+					</row>
+					<row id="4">
+						<property name="type">2</property>
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">117</property>
+					</column>
+					<column id="2">
+						<property name="width">82</property>
+					</column>
+					<column id="3">
+					</column>
+					<column id="4">
+						<property name="width">65</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[安徽省立医院（西区）]]></property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[出院及死亡人数统计表]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[=tostr(year(@start_date))+'年'+tostr(month(@start_date))+'月'+tostr(day(@start_date))+'日'+'至'+tostr(year(@end_date))+'年'+tostr(month(@end_date))+'月'+tostr(day(@end_date))+'日']]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[科室]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[住院总天数]]></property>
+						<property name="bold">0</property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[死亡人数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(DEPT_NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(COU)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(DAYS)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(DCOU)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

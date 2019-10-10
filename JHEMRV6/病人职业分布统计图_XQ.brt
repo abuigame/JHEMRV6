@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病人职业分布统计图]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_sum" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT occupation, f1 as pasum,
+       (SELECT SUM(f1) AS total
+          FROM (select ROWNUM id, a.occupation, a.pasum as f1
+                  from (select t.occupation, count(*) as pasum, '' as sump
+                          from R_PAT_VISIT t
+                         where t.discharge_date_time >=
+                               ?
+                           and t.discharge_date_time <
+                               ? + 1
+                         group by t.occupation
+                         order by pasum desc) a) b
+         WHERE (id <= a.id)) AS sump
+  FROM (select ROWNUM id, a.occupation, a.pasum as f1
+          from (select t.occupation, count(*) as pasum, '' as sump
+                  from R_PAT_VISIT t
+                 where t.discharge_date_time >=
+                       ?
+                   and t.discharge_date_time <
+                       ? + 1
+                 group by t.occupation
+                 order by pasum desc) a) a]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-9-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-10-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+			</page>
+			<grid row="8" col="4">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">45</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">27</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+						<property name="height">18</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+						<property name="height">277</property>
+					</row>
+					<row id="8">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">211</property>
+					</column>
+					<column id="2">
+						<property name="width">99</property>
+					</column>
+					<column id="3">
+						<property name="width">99</property>
+					</column>
+					<column id="4">
+						<property name="width">99</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[病人职业分布情况]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">16</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" colspan="3" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"---"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[职业]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[病人数]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[百分比%]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[累计%]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds_sum.select(OCCUPATION)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_sum.select(PASUM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=(B4{})/(B5{})*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=(ds_sum.suMP/B5())*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[合计：]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=sum(B4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="view"><![CDATA[100]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="7,1" type="1" colspan="4" >
+						<property name="value"><![CDATA[<chart><param name="seriescount" value="1" /><param name="legendon" value="true" /><param name="3ddepth" value="18" /><param name="titlefont" value="宋体,plain,20" /><param name="webtarget_1" value="_blank" /><param name="webtarget_0" value="_blank" /><param name="pielabelson" value="true" /><param name="samplelabels" value="=A4{}" /><param name="pointinglabelfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="outside" /><param name="sampleaxislabelfont" value="宋体,plain,11" /><param name="percentdecimalcount" value="2" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="percentlabelson" value="true" /><param name="startangle" value="90" /><param name="3dmodeon" value="true" /><param name="serieslabelson" value="false" /><param name="pielabelfont" value="宋体,plain,11" /><param name="endangle" value="270" /><param name="serieslabels" value=" " /><param name="legendfont" value="宋体,plain,11" /><param name="serieslabels_0" value=" " /><param name="rangelabelson" value="true" /><param name="valuelabelstyle" value="outside" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="insidelabelfont" value="宋体,plain,11" /><param name="outsidelabelfont" value="宋体,plain,11" /><param name="charttitle" value="病人职业分布情况统计图" /><param name="samplevalues_0" value="=B4{}" /><param name="sampledecimalcount" value="0" /><param name="background" value="255,255,255" /><param name="chart" value="pie" /></chart>]]></property>
+						<property name="font-size">12</property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="8,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=打印日期：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="font-size">12</property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="8,3" type="0" colspan="2" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

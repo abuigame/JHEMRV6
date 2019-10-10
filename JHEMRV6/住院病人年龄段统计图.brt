@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[住院病人年龄段统计图]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_a" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[
+select case
+         when (ages >= 0 and ages < 10) then
+          '0-9'
+         when (ages >= 10 and ages <= 19) then
+          '10-19'
+         when (ages >= 20 and ages <= 29) then
+          '20-29'
+         when (ages >= 30 and ages <= 39) then
+          '30-39'
+         when (ages >= 40 and ages <= 49) then
+          '40-49'
+         when (ages >= 50 and ages <= 59) then
+          '50-59'
+         when (ages >= 60 and ages <= 69) then
+          '60-69'
+         when (ages >= 70 and ages <= 79) then
+          '70-79'
+         when (ages >= 80 and ages <= 89) then
+          '80-89'
+         when (ages >= 90 and ages <= 99) then
+          '90-99'
+       
+         else
+          '100-'
+       end patage,
+       count(*) patsum
+  from (select trunc(months_between(t.admission_date_time, p.date_of_birth) / 12) as ages,
+               t.*
+          from R_PAT_VISIT t
+          join R_PAT_MASTER_INDEX p
+            on t.patient_id = p.patient_id
+         where 
+           t.dept_discharge_from in (select dept_code from dept_dict where type_code=1)
+           and t.discharge_date_time >=?
+           and t.discharge_date_time <?+1
+           and t.discharge_date_time is not null
+         ORDER BY trunc(months_between(sysdate, p.date_of_birth) / 12)) tt
+ group by case
+            when (ages >= 0 and ages < 10) then
+             '0-9'
+            when (ages >= 10 and ages <= 19) then
+             '10-19'
+            when (ages >= 20 and ages <= 29) then
+             '20-29'
+            when (ages >= 30 and ages <= 39) then
+             '30-39'
+            when (ages >= 40 and ages <= 49) then
+             '40-49'
+            when (ages >= 50 and ages <= 59) then
+             '50-59'
+            when (ages >= 60 and ages <= 69) then
+             '60-69'
+            when (ages >= 70 and ages <= 79) then
+             '70-79'
+            when (ages >= 80 and ages <= 89) then
+             '80-89'
+            when (ages >= 90 and ages <= 99) then
+             '90-99'
+          
+            else
+             '100-'
+          end
+
+ order by 1
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_e" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[
+select case
+         when (ages >= 0 and ages < 10) then
+          '0-9'
+         when (ages >= 10 and ages <= 19) then
+          '10-19'
+         when (ages >= 20 and ages <= 29) then
+          '20-29'
+         when (ages >= 30 and ages <= 39) then
+          '30-39'
+         when (ages >= 40 and ages <= 49) then
+          '40-49'
+         when (ages >= 50 and ages <= 59) then
+          '50-59'
+         when (ages >= 60 and ages <= 69) then
+          '60-69'
+         when (ages >= 70 and ages <= 79) then
+          '70-79'
+         when (ages >= 80 and ages <= 89) then
+          '80-89'
+         when (ages >= 90 and ages <= 99) then
+          '90-99'
+       
+         else
+          '100-'
+       end patage,
+       count(*) patsum
+  from (select trunc(months_between(t.admission_date_time, p.date_of_birth) / 12) as ages,
+               t.*
+          from R_PAT_VISIT t
+          join R_PAT_MASTER_INDEX p
+            on t.patient_id = p.patient_id
+         where
+           t.dept_discharge_from in (select dept_code from dept_dict where type_code=1)
+           and t.discharge_date_time >= ?
+           and t.discharge_date_time < ?+1
+             and t.discharge_date_time is not null
+             and p.sex='女'
+         ORDER BY ages) tt
+ group by case
+            when (ages >= 0 and ages < 10) then
+             '0-9'
+            when (ages >= 10 and ages <= 19) then
+             '10-19'
+            when (ages >= 20 and ages <= 29) then
+             '20-29'
+            when (ages >= 30 and ages <= 39) then
+             '30-39'
+            when (ages >= 40 and ages <= 49) then
+             '40-49'
+            when (ages >= 50 and ages <= 59) then
+             '50-59'
+            when (ages >= 60 and ages <= 69) then
+             '60-69'
+            when (ages >= 70 and ages <= 79) then
+             '70-79'
+            when (ages >= 80 and ages <= 89) then
+             '80-89'
+            when (ages >= 90 and ages <= 99) then
+             '90-99'
+          
+            else
+             '100-'
+          end
+
+ order by 1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_i" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[
+select case
+         when (ages >= 0 and ages < 10) then
+          '0-9'
+         when (ages >= 10 and ages <= 19) then
+          '10-19'
+         when (ages >= 20 and ages <= 29) then
+          '20-29'
+         when (ages >= 30 and ages <= 39) then
+          '30-39'
+         when (ages >= 40 and ages <= 49) then
+          '40-49'
+         when (ages >= 50 and ages <= 59) then
+          '50-59'
+         when (ages >= 60 and ages <= 69) then
+          '60-69'
+         when (ages >= 70 and ages <= 79) then
+          '70-79'
+         when (ages >= 80 and ages <= 89) then
+          '80-89'
+         when (ages >= 90 and ages <= 99) then
+          '90-99'
+       
+         else
+          '100-'
+       end patage,
+       count(*) patsum
+  from (select trunc(months_between(t.admission_date_time, p.date_of_birth) / 12) as ages,
+               t.*
+          from R_PAT_VISIT t
+          join R_PAT_MASTER_INDEX p
+            on t.patient_id = p.patient_id
+         where
+           t.dept_discharge_from in (select dept_code from dept_dict where type_code=1) 
+           and t.discharge_date_time >=?
+           and t.discharge_date_time < ?+1
+             and t.discharge_date_time is not null
+             and p.sex='男'
+         ORDER BY ages) tt
+ group by case
+            when (ages >= 0 and ages < 10) then
+             '0-9'
+            when (ages >= 10 and ages <= 19) then
+             '10-19'
+            when (ages >= 20 and ages <= 29) then
+             '20-29'
+            when (ages >= 30 and ages <= 39) then
+             '30-39'
+            when (ages >= 40 and ages <= 49) then
+             '40-49'
+            when (ages >= 50 and ages <= 59) then
+             '50-59'
+            when (ages >= 60 and ages <= 69) then
+             '60-69'
+            when (ages >= 70 and ages <= 79) then
+             '70-79'
+            when (ages >= 80 and ages <= 89) then
+             '80-89'
+            when (ages >= 90 and ages <= 99) then
+             '90-99'
+          
+            else
+             '100-'
+          end
+
+ order by 1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-09-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-10-05</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+			</page>
+			<grid row="10" col="11">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">48</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+						<property name="type">2</property>
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+						<property name="height">39</property>
+					</row>
+					<row id="8">
+						<property name="type">4</property>
+						<property name="height">17</property>
+					</row>
+					<row id="9">
+						<property name="type">4</property>
+						<property name="height">266</property>
+					</row>
+					<row id="10">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">78</property>
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+					</column>
+					<column id="4">
+						<property name="width">16</property>
+					</column>
+					<column id="5">
+					</column>
+					<column id="6">
+						<property name="width">66</property>
+					</column>
+					<column id="7">
+						<property name="width">61</property>
+					</column>
+					<column id="8">
+						<property name="width">14</property>
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+						<property name="width">57</property>
+					</column>
+					<column id="11">
+						<property name="width">62</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="11" >
+						<property name="value"><![CDATA[住院病人年龄段统计]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">16</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" colspan="5" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"-----"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" rowspan="2" >
+						<property name="value"><![CDATA[年龄段]]></property>
+						<property name="font-size">11</property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<property name="font-size">11</property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" rowspan="2" >
+						<property name="value"><![CDATA[%]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" colspan="3" >
+						<property name="value"><![CDATA[男性]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" colspan="3" >
+						<property name="value"><![CDATA[女性]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[本组%]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[年龄组%]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[本组%]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[年龄组%]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=ds_a.select(PATAGE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=ds_a.select(PATSUM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=(B5{}/B6{})*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=ds_i.getone(ds_i.pATSUM,ds_i.pATAGE=ds_a.patage)]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<property name="value"><![CDATA[=(E5{}/E6{})*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,7" type="0" >
+						<property name="value"><![CDATA[=(E5{}/B5{})*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,8" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,9" type="0" >
+						<property name="value"><![CDATA[=ds_e.getone(ds_e.pATSUM,ds_e.pATAGE=ds_a.patage)]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,10" type="0" >
+						<property name="value"><![CDATA[=(I5{}/I6{})*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,11" type="0" >
+						<property name="value"><![CDATA[=(I5{}/B5{})*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<property name="value"><![CDATA[总计：]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<property name="value"><![CDATA[=sum(B5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<property name="value"><![CDATA[=sum(E5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,7" type="0" >
+						<property name="value"><![CDATA[=100*e6/b6]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,8" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,9" type="0" >
+						<property name="value"><![CDATA[=sum(I5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,10" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,11" type="0" >
+						<property name="value"><![CDATA[=100*i6/b6]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[本组总病人数：]]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="7,3" type="0" >
+						<property name="value"><![CDATA[=sum(B5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,8" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,9" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,10" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,11" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+					<cell id="8,8" type="0" >
+					</cell>
+					<cell id="8,9" type="0" >
+					</cell>
+					<cell id="8,10" type="0" >
+					</cell>
+					<cell id="8,11" type="0" >
+					</cell>
+					<cell id="9,1" type="1" colspan="11" >
+						<property name="value"><![CDATA[<chart><param name="seriescount" value="1" /><param name="legendon" value="true" /><param name="3ddepth" value="18" /><param name="titlefont" value="宋体,plain,20" /><param name="webtarget_0" value="_blank" /><param name="pielabelson" value="true" /><param name="samplelabels" value="=A5{}" /><param name="pointinglabelfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="outside" /><param name="sampleaxislabelfont" value="宋体,plain,11" /><param name="percentdecimalcount" value="2" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="percentlabelson" value="true" /><param name="startangle" value="90" /><param name="3dmodeon" value="true" /><param name="serieslabelson" value="false" /><param name="pielabelfont" value="宋体,plain,11" /><param name="endangle" value="270" /><param name="serieslabels" value=" " /><param name="legendfont" value="宋体,plain,11" /><param name="serieslabels_0" value=" " /><param name="rangelabelson" value="true" /><param name="valuelabelstyle" value="outside" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="insidelabelfont" value="宋体,plain,11" /><param name="outsidelabelfont" value="宋体,plain,11" /><param name="charttitle" value="住院病人年龄段统计图" /><param name="samplevalues_0" value="=C5{}" /><param name="sampledecimalcount" value="0" /><param name="background" value="255,255,255" /><param name="chart" value="pie" /></chart>]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="10,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[=打印时间：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="10,7" type="0" >
+					</cell>
+					<cell id="10,8" type="0" >
+					</cell>
+					<cell id="10,9" type="0" >
+					</cell>
+					<cell id="10,10" type="0" >
+					</cell>
+					<cell id="10,11" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

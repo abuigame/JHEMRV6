@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[住院病人死亡率统计表]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_dept" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_discharge_from as dept_code , d.dept_name, count(*) as patsum
+  from r_pat_visit t, dept_dict d
+ where t.discharge_date_time >= ?
+   and t.discharge_date_time < ?+ 1
+   and t.dept_discharge_from = d.dept_code 
+ group by t.dept_discharge_from, d.dept_name,d.display_order
+order by d.display_order
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_die" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_discharge_from as dept_code , count(*) as patsum
+  from r_pat_visit t
+ where t.discharge_date_time >= ?
+   and t.discharge_date_time < ?+ 1
+   and t.discharge_disposition = '死亡'
+
+ group by t.dept_discharge_from
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_yibao" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[ select X1.PATSUM, X2.DIESUM as operadie
+   from (select '1' AS RN, count(*) as patsum
+           from r_pat_visit t
+          where t.discharge_date_time >= ?
+            and t.discharge_date_time <
+               ? + 1
+            and t.discharge_disposition = '死亡'
+            and (t.boh_charge_type = 1 or t.boh_charge_type = 2)) X1
+   LEFT JOIN (select '1' as RN, count(*) as diesum
+                from r_pat_visit t, r_operation_doct t1
+               where t.patient_id = t1.patient_id
+                 and t.visit_id = t1.visit_id
+                 and t.discharge_date_time >=
+                    ?
+                 and t.discharge_date_time <
+                     ?+ 1
+                 and t.discharge_disposition = '死亡'
+                 and t1.operation_type ='0'
+                 and t1.operation_no = 1
+                 and (t.boh_charge_type = 1 or t.boh_charge_type = 2)) X2
+     ON X1.RN = X2.RN
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_noyibao_opera" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select count(*) as diesum
+                from r_pat_visit t, r_operation_doct t1
+               where t.patient_id = t1.patient_id
+                 and t.visit_id = t1.visit_id
+                 and t.discharge_date_time >=
+                    ?
+                 and t.discharge_date_time <
+                    ?+ 1
+                 and t.discharge_disposition = '死亡'
+                 and t1.operation_type = '0'
+                 and t1.operation_no = 1
+                 and (t.boh_charge_type <> 1 or t.boh_charge_type <>2)]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2013-01-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2013-01-31</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+				<property name="margin-left">15</property>
+				<property name="margin-right">15</property>
+				<property name="margin-top">20</property>
+				<property name="margin-bottom">15</property>
+			</page>
+			<grid row="12" col="6">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">50</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">30</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+						<property name="height">24</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+						<property name="type">4</property>
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+						<property name="height">29</property>
+					</row>
+					<row id="8">
+						<property name="type">4</property>
+					</row>
+					<row id="9">
+						<property name="type">4</property>
+						<property name="height">26</property>
+					</row>
+					<row id="10">
+						<property name="type">4</property>
+					</row>
+					<row id="11">
+						<property name="type">4</property>
+						<property name="height">29</property>
+					</row>
+					<row id="12">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">151</property>
+					</column>
+					<column id="2">
+						<property name="width">118</property>
+					</column>
+					<column id="3">
+						<property name="width">92</property>
+					</column>
+					<column id="4">
+						<property name="width">97</property>
+					</column>
+					<column id="5">
+						<property name="width">92</property>
+					</column>
+					<column id="6">
+						<property name="width">115</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="6" >
+						<property name="value"><![CDATA[住院病人死亡率统计表]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">16</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" colspan="4" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"---"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="font-size">12</property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[死亡人数]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[本科死亡率%]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[死亡总数比%]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[全院死亡率%]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(DEPT_NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_dept.PATSUM]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds_die.GEtone(ds_die.PATSUM,ds_die.DEPT_CODE=ds_dept.DEPT_CODE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=if(c4!=0,100*c4/b4,null)]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=if(c4!=0,100*c4/c5,null)]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=if(c4!=0,100*c4/b5,null)]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[合计：]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=SUM(B4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=SUM(C4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<property name="bold">0</property>
+						<property name="italic">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<property name="value"><![CDATA[=100*C5/B5]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<property name="bold">0</property>
+						<property name="italic">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" rowspan="5" >
+						<property name="value"><![CDATA[死亡病人类型组成]]></property>
+						<property name="font-size">12</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="7,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[=医保病人+"("+(D7+D8)+")"]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="7,3" type="0" >
+						<property name="value"><![CDATA[手术病人]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,4" type="0" >
+						<property name="value"><![CDATA[=ds_yibao.select(OPERADIE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,5" type="1" rowspan="5" colspan="2" >
+						<property name="value"><![CDATA[<chart><param name="seriescount" value="2" /><param name="legendon" value="true" /><param name="3ddepth" value="18" /><param name="titlefont" value="宋体,plain,14" /><param name="valuelineson" value="true" /><param name="webtarget_1" value="_blank" /><param name="webtarget_0" value="_blank" /><param name="pielabelson" value="true" /><param name="rangedecimalcount" value="auto" /><param name="pointinglabelfont" value="宋体,plain,11" /><param name="valuelabelfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="inside" /><param name="sampleaxislabelfont" value="宋体,plain,11" /><param name="percentdecimalcount" value="0" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="startangle" value="90" /><param name="3dmodeon" value="true" /><param name="serieslabelson" value="false" /><param name="pielabelfont" value="宋体,plain,11" /><param name="endangle" value="270" /><param name="samplelabelfont" value="宋体,plain,11" /><param name="serieslabels" value="医保,非医保" /><param name="serieslabels_1" value="非医保" /><param name="legendfont" value="宋体,plain,11" /><param name="serieslabels_0" value="医保" /><param name="rangelabelson" value="true" /><param name="valuelabelstyle" value="outside" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="insidelabelfont" value="宋体,plain,11" /><param name="autolabelspacingon" value="true" /><param name="outsidelabelfont" value="宋体,plain,11" /><param name="samplevalues_0" value="=D7+D8" /><param name="charttitle" value="死亡病人类型组成图" /><param name="baroutlineoff" value="true" /><param name="sampledecimalcount" value="0" /><param name="samplevalues_1" value="=D9+D10" /><param name="background" value="255,255,255" /><param name="chart" value="pie" /></chart>]]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="8,3" type="0" >
+						<property name="value"><![CDATA[非手术病人]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="8,4" type="0" >
+						<property name="value"><![CDATA[=ds_yibao.select(PATSUM)-D7]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="9,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[=非医保病人+"("+(D9+D10)+")"]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="9,3" type="0" >
+						<property name="value"><![CDATA[手术病人]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="9,4" type="0" >
+						<property name="value"><![CDATA[=ds_noyibao_opera.select(DIESUM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="10,3" type="0" >
+						<property name="value"><![CDATA[非手术病人]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="10,4" type="0" >
+						<property name="value"><![CDATA[=C5-D7-D8-D9]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="11,2" type="0" colspan="2" >
+						<property name="value"><![CDATA[总计：]]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="11,4" type="0" >
+						<property name="value"><![CDATA[=C5]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="font-size">12</property>
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="12,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=打印时间：+tostr(now(),'yyyy-mm-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

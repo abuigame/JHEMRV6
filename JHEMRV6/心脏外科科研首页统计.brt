@@ -1,0 +1,2078 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[心脏外科科研首页统计]]></name>
+		<dataSets>
+			<dataSet name="db" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[  select t.patient_id,
+         p.name,
+         t.age,
+         p.sex,
+         t.occupation,
+         t.marital_status,
+         p.date_of_birth,
+         t.admission_date_time,
+         t.discharge_date_time,
+         t.bed_label,
+         t.ATTENDING_DOCTOR,
+         t.total_costs,
+         DECODE(TRUNC(t.DISCHARGE_DATE_TIME) - TRUNC(t.ADMISSION_DATE_TIME),
+                0,
+                1,
+                TRUNC(t.DISCHARGE_DATE_TIME) - TRUNC(t.ADMISSION_DATE_TIME)) AS 住院天数,
+         (select dept_name
+            from dept_dict
+           where dept_code = t.dept_admission_to) 入院科室,
+         (select dept_name
+            from dept_dict
+           where dept_code = t.dept_discharge_from) 出院科室,
+         d.ryzd,
+         d2.sssj,
+         d1.ssmc,
+         d3.sssz,
+         t.Service_Agency as SERVICE_AGENCY,
+         t.HOME_TEL as 电话1,
+         t.WORK_TEL as 电话2,
+         t.NEXT_OF_KIN as 联系人,
+         t.NEXT_OF_KIN_PHONE as 电话3,
+         t1.DEATHAFTEROPER as 术后实际死亡,
+         t1.ISINAFTEROPER30 as 术后30天全因再入院,
+         t1.ISESOPHAGUSULTRASOUND as 术中使用食道超声,
+         t1.TRACHEALVENTILATIONTIME as 机械通气时间,
+         t1.ISINTUBATION as 术后二次气管拆管,
+         t1.ISDEEPCHESTINFECTION as 胸骨深部感染,
+         t1.ISCEREBROVASCULARACCIDENT as 脑卒中或脑血管意外,
+         t1.ISOPENTHECHESTAGAIN as 再次开胸探查,
+         t1.ISATRIOVENTRICULARBLOCK as 术后Ⅲ度房室传导阻滞,
+         t1.ISPERMANENTPACEMAKER as 永久使用起搏器,
+         t1.ISMALIGNANTARRHYTHMIAS as 术后发生恶性心律失常,
+         t1.ISRENALINSUFFICIENCY as 术后肾功能不全,
+         t1.ISANTIBIOTICS as 术后预防性使用抗生素,
+         t1.VARIETIES as 品种,
+         t1.PERIODOFTREATMENT as 疗程,
+         t1.ISFREQUENCYABLATION as 是否微创手术,
+         t1.ISHAVE_AGAIN_OPER as 微创手术方式,
+         t1.ECHOCARDIOGRAMBEFORE as 超声心动图号码术前,
+         t1.ECHOCARDIOGRAMAFTER as 术后,
+         t1.ISBLOODTRANS as 输血,
+         t1.REDBLOODCELLSVOLUME as 输血量红细胞,
+         t1.PLASMAVOLUME as 血浆,
+         t1.PLATELETVOLUME as 血小板,
+         t1.ISDISCWEEKSLEAKAGE as 瓣周漏,
+         t1.ISMERGERFIBRILLATION as 术前合并房颤,
+         t1.ISLINEFIBRILLATION as 合并房颤同期行房颤射频消融术,
+         t1.ISMITRALVALVEOPLASTY as 是否行二尖瓣成形术,
+         t1.ISADVICEWARFARINSODIUM as 出院医嘱华法林钠,
+         t1.ISASPIRIN as 术前使用β受体阻滞剂,
+         t1.ISBETABLOCKERS as 术后早期使用阿司匹林,
+         t1.ISLEFTBREASTARTERY as 术中使用左侧乳内动脉,
+         t1.ISRIGHTBREASTARTERY as 术中使用右侧乳内动脉,
+         t1.ISRADIALARTERY as 术中使用桡动脉,
+         t1.ISADVICELIPIDLOWERING as 出院医嘱降脂药,
+         t1.ISADVICEASPIRIN as 出院医嘱阿司匹林,
+         t1.ISADVICEBETABLOCKERS as 出院医嘱β受体阻滞剂,
+         t1.ISRESIDUALSHUNT as 缺损残余分流
+    from PAT_VISIT t
+    left join pat_master_index p
+      on t.patient_id = p.patient_id
+    left join PAT_VISIT1 t1
+      on t.visit_id = t1.visit_id
+     and t.patient_id = t1.patient_id
+     and t.hospital_no = t1.hospital_no
+    left join (select t.patient_id,
+                      t.visit_id,
+                      LISTAGG(t.diagnosis_desc, ';') within group(order by t.diagnosis_no || t.diagnosis_sub_no asc) as ryzd
+                 from PAT_DIAGNOSIS t
+                where t.diagnosis_type = '3'
+                group by t.patient_id, t.visit_id) d
+      on t.patient_id = d.patient_id
+     and t.visit_id = d.visit_id
+    left join (select t.patient_id,
+                      t.visit_id,
+                      LISTAGG(t.operation_desc, ';') within group(order by t.operation_no asc) as ssmc
+                 from operation t
+                group by t.patient_id, t.visit_id) d1
+      on t.patient_id = d1.patient_id
+     and t.visit_id = d1.visit_id
+    left join (select t.patient_id,
+                      t.visit_id,
+                      LISTAGG(to_char(t.operating_date,'yyyy-mm-dd hh24:mi:ss'), ';') within group(order by t.operation_no asc) as sssj
+                 from operation t
+                group by t.patient_id, t.visit_id) d2
+      on t.patient_id = d2.patient_id
+     and t.visit_id = d2.visit_id
+    left join (select t.patient_id,
+                      t.visit_id,
+                      LISTAGG(t.operator, ';') within group(order by t.operation_no asc) as sssz
+                 from operation t
+                group by t.patient_id, t.visit_id) d3
+      on t.patient_id = d3.patient_id
+     and t.visit_id = d3.visit_id 
+             where t.discharge_date_time between ? and ? +1
+               and t.dept_discharge_from = ?
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="dept_code" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2016-08-01</property>
+				<property name="desc">开始日期</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2016-08-31</property>
+				<property name="desc">结束日期</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="dept_code" type="6">
+				<property name="dateFormat"></property>
+				<property name="default">1548</property>
+				<property name="desc">科室代码</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+			</page>
+			<grid row="12" col="59">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="height">32</property>
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+					</column>
+					<column id="4">
+					</column>
+					<column id="5">
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+					</column>
+					<column id="11">
+					</column>
+					<column id="12">
+					</column>
+					<column id="13">
+					</column>
+					<column id="14">
+					</column>
+					<column id="15">
+					</column>
+					<column id="16">
+					</column>
+					<column id="17">
+					</column>
+					<column id="18">
+					</column>
+					<column id="19">
+					</column>
+					<column id="20">
+					</column>
+					<column id="21">
+					</column>
+					<column id="22">
+					</column>
+					<column id="23">
+					</column>
+					<column id="24">
+					</column>
+					<column id="25">
+					</column>
+					<column id="26">
+					</column>
+					<column id="27">
+					</column>
+					<column id="28">
+					</column>
+					<column id="29">
+					</column>
+					<column id="30">
+					</column>
+					<column id="31">
+					</column>
+					<column id="32">
+					</column>
+					<column id="33">
+					</column>
+					<column id="34">
+					</column>
+					<column id="35">
+					</column>
+					<column id="36">
+					</column>
+					<column id="37">
+					</column>
+					<column id="38">
+					</column>
+					<column id="39">
+					</column>
+					<column id="40">
+					</column>
+					<column id="41">
+					</column>
+					<column id="42">
+					</column>
+					<column id="43">
+					</column>
+					<column id="44">
+					</column>
+					<column id="45">
+					</column>
+					<column id="46">
+					</column>
+					<column id="47">
+					</column>
+					<column id="48">
+					</column>
+					<column id="49">
+					</column>
+					<column id="50">
+					</column>
+					<column id="51">
+					</column>
+					<column id="52">
+					</column>
+					<column id="53">
+					</column>
+					<column id="54">
+					</column>
+					<column id="55">
+					</column>
+					<column id="56">
+					</column>
+					<column id="57">
+					</column>
+					<column id="58">
+					</column>
+					<column id="59">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="59" >
+						<property name="value"><![CDATA[心脏外科出院患者明细内容查询]]></property>
+						<property name="font-size">12</property>
+						<property name="bold">0</property>
+						<border type="0">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null;null</border>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[住院号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[姓名]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="value"><![CDATA[性别]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<property name="value"><![CDATA[入院日期]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<property name="value"><![CDATA[出院日期]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<property name="value"><![CDATA[年龄]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" >
+						<property name="value"><![CDATA[职业]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,8" type="0" >
+						<property name="value"><![CDATA[婚姻]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" >
+						<property name="value"><![CDATA[主治医师]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,10" type="0" >
+						<property name="value"><![CDATA[床位]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,11" type="0" >
+						<property name="value"><![CDATA[总费用]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,12" type="0" >
+						<property name="value"><![CDATA[入院科室]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,13" type="0" >
+						<property name="value"><![CDATA[出院科室]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,14" type="0" >
+						<property name="value"><![CDATA[出院诊断描述]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,15" type="0" >
+						<property name="value"><![CDATA[住院天数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,16" type="0" >
+						<property name="value"><![CDATA[手术时间]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,17" type="0" >
+						<property name="value"><![CDATA[手术名称]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,18" type="0" >
+						<property name="value"><![CDATA[手术术者]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,19" type="0" >
+						<property name="value"><![CDATA[电话1]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,20" type="0" >
+						<property name="value"><![CDATA[电话2]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,21" type="0" >
+						<property name="value"><![CDATA[联系人]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,22" type="0" >
+						<property name="value"><![CDATA[电话3]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,23" type="0" >
+						<property name="value"><![CDATA[术后实际死亡]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,24" type="0" >
+						<property name="value"><![CDATA[术后30天全因再入院]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,25" type="0" >
+						<property name="value"><![CDATA[术中使用食道超声]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,26" type="0" >
+						<property name="value"><![CDATA[机械通气时间]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,27" type="0" >
+						<property name="value"><![CDATA[术后二次气管拆管]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,28" type="0" >
+						<property name="value"><![CDATA[胸骨深部感染]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,29" type="0" >
+						<property name="value"><![CDATA[脑卒中或脑血管意外]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,30" type="0" >
+						<property name="value"><![CDATA[再次开胸探查]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,31" type="0" >
+						<property name="value"><![CDATA[术后Ⅲ度房室传导阻滞]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,32" type="0" >
+						<property name="value"><![CDATA[永久使用起搏器]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,33" type="0" >
+						<property name="value"><![CDATA[术后发生恶性心律失常]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,34" type="0" >
+						<property name="value"><![CDATA[术后肾功能不全]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,35" type="0" >
+						<property name="value"><![CDATA[术后预防性使用抗生素]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,36" type="0" >
+						<property name="value"><![CDATA[品种]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,37" type="0" >
+						<property name="value"><![CDATA[疗程]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,38" type="0" >
+						<property name="value"><![CDATA[是否微创手术]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,39" type="0" >
+						<property name="value"><![CDATA[微创手术方式]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,40" type="0" >
+						<property name="value"><![CDATA[超声心动图号码术前]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,41" type="0" >
+						<property name="value"><![CDATA[术后]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,42" type="0" >
+						<property name="value"><![CDATA[输血]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,43" type="0" >
+						<property name="value"><![CDATA[输血量红细胞]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,44" type="0" >
+						<property name="value"><![CDATA[血浆]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,45" type="0" >
+						<property name="value"><![CDATA[血小板]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,46" type="0" >
+						<property name="value"><![CDATA[瓣周漏]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,47" type="0" >
+						<property name="value"><![CDATA[术前合并房颤]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,48" type="0" >
+						<property name="value"><![CDATA[合并房颤同期行房颤射频消融术]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,49" type="0" >
+						<property name="value"><![CDATA[是否行二尖瓣成形术]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,50" type="0" >
+						<property name="value"><![CDATA[出院医嘱华法林钠]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,51" type="0" >
+						<property name="value"><![CDATA[术前使用β受体阻滞剂]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,52" type="0" >
+						<property name="value"><![CDATA[术后早期使用阿司匹林]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,53" type="0" >
+						<property name="value"><![CDATA[术中使用左侧乳内动脉]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,54" type="0" >
+						<property name="value"><![CDATA[术中使用右侧乳内动脉]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,55" type="0" >
+						<property name="value"><![CDATA[术中使用桡动脉]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,56" type="0" >
+						<property name="value"><![CDATA[出院医嘱降脂药]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,57" type="0" >
+						<property name="value"><![CDATA[出院医嘱阿司匹林]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,58" type="0" >
+						<property name="value"><![CDATA[出院医嘱β受体阻滞剂]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,59" type="0" >
+						<property name="value"><![CDATA[缺损残余分流]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[=db.select(PATIENT_ID)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[=db.select(NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[=db.select(SEX)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[=db.select(ADMISSION_DATE_TIME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[=db.select(DISCHARGE_DATE_TIME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[=db.select(AGE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[=db.select(OCCUPATION)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[=db.select(MARITAL_STATUS)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[=db.select(ATTENDING_DOCTOR)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[=db.select(BED_LABEL)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[=db.select(TOTAL_COSTS)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,12" type="0" >
+						<property name="value"><![CDATA[=db.select(入院科室)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,13" type="0" >
+						<property name="value"><![CDATA[=db.select(出院科室)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,14" type="0" >
+						<property name="value"><![CDATA[=db.select(RYZD)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,15" type="0" >
+						<property name="value"><![CDATA[=db.select(住院天数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,16" type="0" >
+						<property name="value"><![CDATA[=db.select(SSSJ)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,17" type="0" >
+						<property name="value"><![CDATA[=db.select(SSMC)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,18" type="0" >
+						<property name="value"><![CDATA[=db.select(SSSZ)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,19" type="0" >
+						<property name="value"><![CDATA[=db.select(电话1)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,20" type="0" >
+						<property name="value"><![CDATA[=db.select(电话2)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,21" type="0" >
+						<property name="value"><![CDATA[=db.select(联系人)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,22" type="0" >
+						<property name="value"><![CDATA[=db.select(电话3)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,23" type="0" >
+						<property name="value"><![CDATA[=db.select(术后实际死亡)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,24" type="0" >
+						<property name="value"><![CDATA[=db.select(术后30天全因再入院)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,25" type="0" >
+						<property name="value"><![CDATA[=db.select(术中使用食道超声)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,26" type="0" >
+						<property name="value"><![CDATA[=db.select(机械通气时间)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,27" type="0" >
+						<property name="value"><![CDATA[=db.select(术后二次气管拆管)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,28" type="0" >
+						<property name="value"><![CDATA[=db.select(胸骨深部感染)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,29" type="0" >
+						<property name="value"><![CDATA[=db.select(脑卒中或脑血管意外)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,30" type="0" >
+						<property name="value"><![CDATA[=db.select(再次开胸探查)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,31" type="0" >
+						<property name="value"><![CDATA[=db.select(术后Ⅲ度房室传导阻滞)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,32" type="0" >
+						<property name="value"><![CDATA[=db.select(永久使用起搏器)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,33" type="0" >
+						<property name="value"><![CDATA[=db.select(术后发生恶性心律失常)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,34" type="0" >
+						<property name="value"><![CDATA[=db.select(术后肾功能不全)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,35" type="0" >
+						<property name="value"><![CDATA[=db.select(术后预防性使用抗生素)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,36" type="0" >
+						<property name="value"><![CDATA[=db.select(品种)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,37" type="0" >
+						<property name="value"><![CDATA[=db.select(疗程)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,38" type="0" >
+						<property name="value"><![CDATA[=db.select(是否微创手术)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,39" type="0" >
+						<property name="value"><![CDATA[=db.select(微创手术方式)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,40" type="0" >
+						<property name="value"><![CDATA[=db.select(超声心动图号码术前)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,41" type="0" >
+						<property name="value"><![CDATA[=db.select(术后)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,42" type="0" >
+						<property name="value"><![CDATA[=db.select(输血)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,43" type="0" >
+						<property name="value"><![CDATA[=db.select(输血量红细胞)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,44" type="0" >
+						<property name="value"><![CDATA[=db.select(血浆)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,45" type="0" >
+						<property name="value"><![CDATA[=db.select(血小板)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,46" type="0" >
+						<property name="value"><![CDATA[=db.select(瓣周漏)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,47" type="0" >
+						<property name="value"><![CDATA[=db.select(术前合并房颤)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,48" type="0" >
+						<property name="value"><![CDATA[=db.select(合并房颤同期行房颤射频消融术)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,49" type="0" >
+						<property name="value"><![CDATA[=db.select(是否行二尖瓣成形术)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,50" type="0" >
+						<property name="value"><![CDATA[=db.select(出院医嘱华法林钠)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,51" type="0" >
+						<property name="value"><![CDATA[=db.select(术前使用Β受体阻滞剂)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,52" type="0" >
+						<property name="value"><![CDATA[=db.select(术后早期使用阿司匹林)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,53" type="0" >
+						<property name="value"><![CDATA[=db.select(术中使用左侧乳内动脉)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,54" type="0" >
+						<property name="value"><![CDATA[=db.select(术中使用右侧乳内动脉)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,55" type="0" >
+						<property name="value"><![CDATA[=db.select(术中使用桡动脉)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,56" type="0" >
+						<property name="value"><![CDATA[=db.select(出院医嘱降脂药)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,57" type="0" >
+						<property name="value"><![CDATA[=db.select(出院医嘱阿司匹林)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,58" type="0" >
+						<property name="value"><![CDATA[=db.select(出院医嘱Β受体阻滞剂)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,59" type="0" >
+						<property name="value"><![CDATA[=db.select(缺损残余分流)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" colspan="5" >
+					</cell>
+					<cell id="4,6" type="0" >
+					</cell>
+					<cell id="4,7" type="0" >
+					</cell>
+					<cell id="4,8" type="0" >
+					</cell>
+					<cell id="4,9" type="0" >
+					</cell>
+					<cell id="4,10" type="0" >
+					</cell>
+					<cell id="4,11" type="0" >
+					</cell>
+					<cell id="4,12" type="0" >
+					</cell>
+					<cell id="4,13" type="0" >
+					</cell>
+					<cell id="4,14" type="0" >
+					</cell>
+					<cell id="4,15" type="0" >
+					</cell>
+					<cell id="4,16" type="0" >
+					</cell>
+					<cell id="4,17" type="0" >
+					</cell>
+					<cell id="4,18" type="0" >
+					</cell>
+					<cell id="4,19" type="0" >
+					</cell>
+					<cell id="4,20" type="0" >
+					</cell>
+					<cell id="4,21" type="0" >
+					</cell>
+					<cell id="4,22" type="0" >
+					</cell>
+					<cell id="4,23" type="0" >
+					</cell>
+					<cell id="4,24" type="0" >
+					</cell>
+					<cell id="4,25" type="0" >
+					</cell>
+					<cell id="4,26" type="0" >
+					</cell>
+					<cell id="4,27" type="0" >
+					</cell>
+					<cell id="4,28" type="0" >
+					</cell>
+					<cell id="4,29" type="0" >
+					</cell>
+					<cell id="4,30" type="0" >
+					</cell>
+					<cell id="4,31" type="0" >
+					</cell>
+					<cell id="4,32" type="0" >
+					</cell>
+					<cell id="4,33" type="0" >
+					</cell>
+					<cell id="4,34" type="0" >
+					</cell>
+					<cell id="4,35" type="0" >
+					</cell>
+					<cell id="4,36" type="0" >
+					</cell>
+					<cell id="4,37" type="0" >
+					</cell>
+					<cell id="4,38" type="0" >
+					</cell>
+					<cell id="4,39" type="0" >
+					</cell>
+					<cell id="4,40" type="0" >
+					</cell>
+					<cell id="4,41" type="0" >
+					</cell>
+					<cell id="4,42" type="0" >
+					</cell>
+					<cell id="4,43" type="0" >
+					</cell>
+					<cell id="4,44" type="0" >
+					</cell>
+					<cell id="4,45" type="0" >
+					</cell>
+					<cell id="4,46" type="0" >
+					</cell>
+					<cell id="4,47" type="0" >
+					</cell>
+					<cell id="4,48" type="0" >
+					</cell>
+					<cell id="4,49" type="0" >
+					</cell>
+					<cell id="4,50" type="0" >
+					</cell>
+					<cell id="4,51" type="0" >
+					</cell>
+					<cell id="4,52" type="0" >
+					</cell>
+					<cell id="4,53" type="0" >
+					</cell>
+					<cell id="4,54" type="0" >
+					</cell>
+					<cell id="4,55" type="0" >
+					</cell>
+					<cell id="4,56" type="0" >
+					</cell>
+					<cell id="4,57" type="0" >
+					</cell>
+					<cell id="4,58" type="0" >
+					</cell>
+					<cell id="4,59" type="0" >
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+					<cell id="5,8" type="0" >
+					</cell>
+					<cell id="5,9" type="0" >
+					</cell>
+					<cell id="5,10" type="0" >
+					</cell>
+					<cell id="5,11" type="0" >
+					</cell>
+					<cell id="5,12" type="0" >
+					</cell>
+					<cell id="5,13" type="0" >
+					</cell>
+					<cell id="5,14" type="0" >
+					</cell>
+					<cell id="5,15" type="0" >
+					</cell>
+					<cell id="5,16" type="0" >
+					</cell>
+					<cell id="5,17" type="0" >
+					</cell>
+					<cell id="5,18" type="0" >
+					</cell>
+					<cell id="5,19" type="0" >
+					</cell>
+					<cell id="5,20" type="0" >
+					</cell>
+					<cell id="5,21" type="0" >
+					</cell>
+					<cell id="5,22" type="0" >
+					</cell>
+					<cell id="5,23" type="0" >
+					</cell>
+					<cell id="5,24" type="0" >
+					</cell>
+					<cell id="5,25" type="0" >
+					</cell>
+					<cell id="5,26" type="0" >
+					</cell>
+					<cell id="5,27" type="0" >
+					</cell>
+					<cell id="5,28" type="0" >
+					</cell>
+					<cell id="5,29" type="0" >
+					</cell>
+					<cell id="5,30" type="0" >
+					</cell>
+					<cell id="5,31" type="0" >
+					</cell>
+					<cell id="5,32" type="0" >
+					</cell>
+					<cell id="5,33" type="0" >
+					</cell>
+					<cell id="5,34" type="0" >
+					</cell>
+					<cell id="5,35" type="0" >
+					</cell>
+					<cell id="5,36" type="0" >
+					</cell>
+					<cell id="5,37" type="0" >
+					</cell>
+					<cell id="5,38" type="0" >
+					</cell>
+					<cell id="5,39" type="0" >
+					</cell>
+					<cell id="5,40" type="0" >
+					</cell>
+					<cell id="5,41" type="0" >
+					</cell>
+					<cell id="5,42" type="0" >
+					</cell>
+					<cell id="5,43" type="0" >
+					</cell>
+					<cell id="5,44" type="0" >
+					</cell>
+					<cell id="5,45" type="0" >
+					</cell>
+					<cell id="5,46" type="0" >
+					</cell>
+					<cell id="5,47" type="0" >
+					</cell>
+					<cell id="5,48" type="0" >
+					</cell>
+					<cell id="5,49" type="0" >
+					</cell>
+					<cell id="5,50" type="0" >
+					</cell>
+					<cell id="5,51" type="0" >
+					</cell>
+					<cell id="5,52" type="0" >
+					</cell>
+					<cell id="5,53" type="0" >
+					</cell>
+					<cell id="5,54" type="0" >
+					</cell>
+					<cell id="5,55" type="0" >
+					</cell>
+					<cell id="5,56" type="0" >
+					</cell>
+					<cell id="5,57" type="0" >
+					</cell>
+					<cell id="5,58" type="0" >
+					</cell>
+					<cell id="5,59" type="0" >
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="6,5" type="0" >
+					</cell>
+					<cell id="6,6" type="0" >
+					</cell>
+					<cell id="6,7" type="0" >
+					</cell>
+					<cell id="6,8" type="0" >
+					</cell>
+					<cell id="6,9" type="0" >
+					</cell>
+					<cell id="6,10" type="0" >
+					</cell>
+					<cell id="6,11" type="0" >
+					</cell>
+					<cell id="6,12" type="0" >
+					</cell>
+					<cell id="6,13" type="0" >
+					</cell>
+					<cell id="6,14" type="0" >
+					</cell>
+					<cell id="6,15" type="0" >
+					</cell>
+					<cell id="6,16" type="0" >
+					</cell>
+					<cell id="6,17" type="0" >
+					</cell>
+					<cell id="6,18" type="0" >
+					</cell>
+					<cell id="6,19" type="0" >
+					</cell>
+					<cell id="6,20" type="0" >
+					</cell>
+					<cell id="6,21" type="0" >
+					</cell>
+					<cell id="6,22" type="0" >
+					</cell>
+					<cell id="6,23" type="0" >
+					</cell>
+					<cell id="6,24" type="0" >
+					</cell>
+					<cell id="6,25" type="0" >
+					</cell>
+					<cell id="6,26" type="0" >
+					</cell>
+					<cell id="6,27" type="0" >
+					</cell>
+					<cell id="6,28" type="0" >
+					</cell>
+					<cell id="6,29" type="0" >
+					</cell>
+					<cell id="6,30" type="0" >
+					</cell>
+					<cell id="6,31" type="0" >
+					</cell>
+					<cell id="6,32" type="0" >
+					</cell>
+					<cell id="6,33" type="0" >
+					</cell>
+					<cell id="6,34" type="0" >
+					</cell>
+					<cell id="6,35" type="0" >
+					</cell>
+					<cell id="6,36" type="0" >
+					</cell>
+					<cell id="6,37" type="0" >
+					</cell>
+					<cell id="6,38" type="0" >
+					</cell>
+					<cell id="6,39" type="0" >
+					</cell>
+					<cell id="6,40" type="0" >
+					</cell>
+					<cell id="6,41" type="0" >
+					</cell>
+					<cell id="6,42" type="0" >
+					</cell>
+					<cell id="6,43" type="0" >
+					</cell>
+					<cell id="6,44" type="0" >
+					</cell>
+					<cell id="6,45" type="0" >
+					</cell>
+					<cell id="6,46" type="0" >
+					</cell>
+					<cell id="6,47" type="0" >
+					</cell>
+					<cell id="6,48" type="0" >
+					</cell>
+					<cell id="6,49" type="0" >
+					</cell>
+					<cell id="6,50" type="0" >
+					</cell>
+					<cell id="6,51" type="0" >
+					</cell>
+					<cell id="6,52" type="0" >
+					</cell>
+					<cell id="6,53" type="0" >
+					</cell>
+					<cell id="6,54" type="0" >
+					</cell>
+					<cell id="6,55" type="0" >
+					</cell>
+					<cell id="6,56" type="0" >
+					</cell>
+					<cell id="6,57" type="0" >
+					</cell>
+					<cell id="6,58" type="0" >
+					</cell>
+					<cell id="6,59" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="7,7" type="0" >
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+					<cell id="7,9" type="0" >
+					</cell>
+					<cell id="7,10" type="0" >
+					</cell>
+					<cell id="7,11" type="0" >
+					</cell>
+					<cell id="7,12" type="0" >
+					</cell>
+					<cell id="7,13" type="0" >
+					</cell>
+					<cell id="7,14" type="0" >
+					</cell>
+					<cell id="7,15" type="0" >
+					</cell>
+					<cell id="7,16" type="0" >
+					</cell>
+					<cell id="7,17" type="0" >
+					</cell>
+					<cell id="7,18" type="0" >
+					</cell>
+					<cell id="7,19" type="0" >
+					</cell>
+					<cell id="7,20" type="0" >
+					</cell>
+					<cell id="7,21" type="0" >
+					</cell>
+					<cell id="7,22" type="0" >
+					</cell>
+					<cell id="7,23" type="0" >
+					</cell>
+					<cell id="7,24" type="0" >
+					</cell>
+					<cell id="7,25" type="0" >
+					</cell>
+					<cell id="7,26" type="0" >
+					</cell>
+					<cell id="7,27" type="0" >
+					</cell>
+					<cell id="7,28" type="0" >
+					</cell>
+					<cell id="7,29" type="0" >
+					</cell>
+					<cell id="7,30" type="0" >
+					</cell>
+					<cell id="7,31" type="0" >
+					</cell>
+					<cell id="7,32" type="0" >
+					</cell>
+					<cell id="7,33" type="0" >
+					</cell>
+					<cell id="7,34" type="0" >
+					</cell>
+					<cell id="7,35" type="0" >
+					</cell>
+					<cell id="7,36" type="0" >
+					</cell>
+					<cell id="7,37" type="0" >
+					</cell>
+					<cell id="7,38" type="0" >
+					</cell>
+					<cell id="7,39" type="0" >
+					</cell>
+					<cell id="7,40" type="0" >
+					</cell>
+					<cell id="7,41" type="0" >
+					</cell>
+					<cell id="7,42" type="0" >
+					</cell>
+					<cell id="7,43" type="0" >
+					</cell>
+					<cell id="7,44" type="0" >
+					</cell>
+					<cell id="7,45" type="0" >
+					</cell>
+					<cell id="7,46" type="0" >
+					</cell>
+					<cell id="7,47" type="0" >
+					</cell>
+					<cell id="7,48" type="0" >
+					</cell>
+					<cell id="7,49" type="0" >
+					</cell>
+					<cell id="7,50" type="0" >
+					</cell>
+					<cell id="7,51" type="0" >
+					</cell>
+					<cell id="7,52" type="0" >
+					</cell>
+					<cell id="7,53" type="0" >
+					</cell>
+					<cell id="7,54" type="0" >
+					</cell>
+					<cell id="7,55" type="0" >
+					</cell>
+					<cell id="7,56" type="0" >
+					</cell>
+					<cell id="7,57" type="0" >
+					</cell>
+					<cell id="7,58" type="0" >
+					</cell>
+					<cell id="7,59" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+					<cell id="8,8" type="0" >
+					</cell>
+					<cell id="8,9" type="0" >
+					</cell>
+					<cell id="8,10" type="0" >
+					</cell>
+					<cell id="8,11" type="0" >
+					</cell>
+					<cell id="8,12" type="0" >
+					</cell>
+					<cell id="8,13" type="0" >
+					</cell>
+					<cell id="8,14" type="0" >
+					</cell>
+					<cell id="8,15" type="0" >
+					</cell>
+					<cell id="8,16" type="0" >
+					</cell>
+					<cell id="8,17" type="0" >
+					</cell>
+					<cell id="8,18" type="0" >
+					</cell>
+					<cell id="8,19" type="0" >
+					</cell>
+					<cell id="8,20" type="0" >
+					</cell>
+					<cell id="8,21" type="0" >
+					</cell>
+					<cell id="8,22" type="0" >
+					</cell>
+					<cell id="8,23" type="0" >
+					</cell>
+					<cell id="8,24" type="0" >
+					</cell>
+					<cell id="8,25" type="0" >
+					</cell>
+					<cell id="8,26" type="0" >
+					</cell>
+					<cell id="8,27" type="0" >
+					</cell>
+					<cell id="8,28" type="0" >
+					</cell>
+					<cell id="8,29" type="0" >
+					</cell>
+					<cell id="8,30" type="0" >
+					</cell>
+					<cell id="8,31" type="0" >
+					</cell>
+					<cell id="8,32" type="0" >
+					</cell>
+					<cell id="8,33" type="0" >
+					</cell>
+					<cell id="8,34" type="0" >
+					</cell>
+					<cell id="8,35" type="0" >
+					</cell>
+					<cell id="8,36" type="0" >
+					</cell>
+					<cell id="8,37" type="0" >
+					</cell>
+					<cell id="8,38" type="0" >
+					</cell>
+					<cell id="8,39" type="0" >
+					</cell>
+					<cell id="8,40" type="0" >
+					</cell>
+					<cell id="8,41" type="0" >
+					</cell>
+					<cell id="8,42" type="0" >
+					</cell>
+					<cell id="8,43" type="0" >
+					</cell>
+					<cell id="8,44" type="0" >
+					</cell>
+					<cell id="8,45" type="0" >
+					</cell>
+					<cell id="8,46" type="0" >
+					</cell>
+					<cell id="8,47" type="0" >
+					</cell>
+					<cell id="8,48" type="0" >
+					</cell>
+					<cell id="8,49" type="0" >
+					</cell>
+					<cell id="8,50" type="0" >
+					</cell>
+					<cell id="8,51" type="0" >
+					</cell>
+					<cell id="8,52" type="0" >
+					</cell>
+					<cell id="8,53" type="0" >
+					</cell>
+					<cell id="8,54" type="0" >
+					</cell>
+					<cell id="8,55" type="0" >
+					</cell>
+					<cell id="8,56" type="0" >
+					</cell>
+					<cell id="8,57" type="0" >
+					</cell>
+					<cell id="8,58" type="0" >
+					</cell>
+					<cell id="8,59" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="9,5" type="0" >
+					</cell>
+					<cell id="9,6" type="0" >
+					</cell>
+					<cell id="9,7" type="0" >
+					</cell>
+					<cell id="9,8" type="0" >
+					</cell>
+					<cell id="9,9" type="0" >
+					</cell>
+					<cell id="9,10" type="0" >
+					</cell>
+					<cell id="9,11" type="0" >
+					</cell>
+					<cell id="9,12" type="0" >
+					</cell>
+					<cell id="9,13" type="0" >
+					</cell>
+					<cell id="9,14" type="0" >
+					</cell>
+					<cell id="9,15" type="0" >
+					</cell>
+					<cell id="9,16" type="0" >
+					</cell>
+					<cell id="9,17" type="0" >
+					</cell>
+					<cell id="9,18" type="0" >
+					</cell>
+					<cell id="9,19" type="0" >
+					</cell>
+					<cell id="9,20" type="0" >
+					</cell>
+					<cell id="9,21" type="0" >
+					</cell>
+					<cell id="9,22" type="0" >
+					</cell>
+					<cell id="9,23" type="0" >
+					</cell>
+					<cell id="9,24" type="0" >
+					</cell>
+					<cell id="9,25" type="0" >
+					</cell>
+					<cell id="9,26" type="0" >
+					</cell>
+					<cell id="9,27" type="0" >
+					</cell>
+					<cell id="9,28" type="0" >
+					</cell>
+					<cell id="9,29" type="0" >
+					</cell>
+					<cell id="9,30" type="0" >
+					</cell>
+					<cell id="9,31" type="0" >
+					</cell>
+					<cell id="9,32" type="0" >
+					</cell>
+					<cell id="9,33" type="0" >
+					</cell>
+					<cell id="9,34" type="0" >
+					</cell>
+					<cell id="9,35" type="0" >
+					</cell>
+					<cell id="9,36" type="0" >
+					</cell>
+					<cell id="9,37" type="0" >
+					</cell>
+					<cell id="9,38" type="0" >
+					</cell>
+					<cell id="9,39" type="0" >
+					</cell>
+					<cell id="9,40" type="0" >
+					</cell>
+					<cell id="9,41" type="0" >
+					</cell>
+					<cell id="9,42" type="0" >
+					</cell>
+					<cell id="9,43" type="0" >
+					</cell>
+					<cell id="9,44" type="0" >
+					</cell>
+					<cell id="9,45" type="0" >
+					</cell>
+					<cell id="9,46" type="0" >
+					</cell>
+					<cell id="9,47" type="0" >
+					</cell>
+					<cell id="9,48" type="0" >
+					</cell>
+					<cell id="9,49" type="0" >
+					</cell>
+					<cell id="9,50" type="0" >
+					</cell>
+					<cell id="9,51" type="0" >
+					</cell>
+					<cell id="9,52" type="0" >
+					</cell>
+					<cell id="9,53" type="0" >
+					</cell>
+					<cell id="9,54" type="0" >
+					</cell>
+					<cell id="9,55" type="0" >
+					</cell>
+					<cell id="9,56" type="0" >
+					</cell>
+					<cell id="9,57" type="0" >
+					</cell>
+					<cell id="9,58" type="0" >
+					</cell>
+					<cell id="9,59" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="10,7" type="0" >
+					</cell>
+					<cell id="10,8" type="0" >
+					</cell>
+					<cell id="10,9" type="0" >
+					</cell>
+					<cell id="10,10" type="0" >
+					</cell>
+					<cell id="10,11" type="0" >
+					</cell>
+					<cell id="10,12" type="0" >
+					</cell>
+					<cell id="10,13" type="0" >
+					</cell>
+					<cell id="10,14" type="0" >
+					</cell>
+					<cell id="10,15" type="0" >
+					</cell>
+					<cell id="10,16" type="0" >
+					</cell>
+					<cell id="10,17" type="0" >
+					</cell>
+					<cell id="10,18" type="0" >
+					</cell>
+					<cell id="10,19" type="0" >
+					</cell>
+					<cell id="10,20" type="0" >
+					</cell>
+					<cell id="10,21" type="0" >
+					</cell>
+					<cell id="10,22" type="0" >
+					</cell>
+					<cell id="10,23" type="0" >
+					</cell>
+					<cell id="10,24" type="0" >
+					</cell>
+					<cell id="10,25" type="0" >
+					</cell>
+					<cell id="10,26" type="0" >
+					</cell>
+					<cell id="10,27" type="0" >
+					</cell>
+					<cell id="10,28" type="0" >
+					</cell>
+					<cell id="10,29" type="0" >
+					</cell>
+					<cell id="10,30" type="0" >
+					</cell>
+					<cell id="10,31" type="0" >
+					</cell>
+					<cell id="10,32" type="0" >
+					</cell>
+					<cell id="10,33" type="0" >
+					</cell>
+					<cell id="10,34" type="0" >
+					</cell>
+					<cell id="10,35" type="0" >
+					</cell>
+					<cell id="10,36" type="0" >
+					</cell>
+					<cell id="10,37" type="0" >
+					</cell>
+					<cell id="10,38" type="0" >
+					</cell>
+					<cell id="10,39" type="0" >
+					</cell>
+					<cell id="10,40" type="0" >
+					</cell>
+					<cell id="10,41" type="0" >
+					</cell>
+					<cell id="10,42" type="0" >
+					</cell>
+					<cell id="10,43" type="0" >
+					</cell>
+					<cell id="10,44" type="0" >
+					</cell>
+					<cell id="10,45" type="0" >
+					</cell>
+					<cell id="10,46" type="0" >
+					</cell>
+					<cell id="10,47" type="0" >
+					</cell>
+					<cell id="10,48" type="0" >
+					</cell>
+					<cell id="10,49" type="0" >
+					</cell>
+					<cell id="10,50" type="0" >
+					</cell>
+					<cell id="10,51" type="0" >
+					</cell>
+					<cell id="10,52" type="0" >
+					</cell>
+					<cell id="10,53" type="0" >
+					</cell>
+					<cell id="10,54" type="0" >
+					</cell>
+					<cell id="10,55" type="0" >
+					</cell>
+					<cell id="10,56" type="0" >
+					</cell>
+					<cell id="10,57" type="0" >
+					</cell>
+					<cell id="10,58" type="0" >
+					</cell>
+					<cell id="10,59" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+					<cell id="11,5" type="0" >
+					</cell>
+					<cell id="11,6" type="0" >
+					</cell>
+					<cell id="11,7" type="0" >
+					</cell>
+					<cell id="11,8" type="0" >
+					</cell>
+					<cell id="11,9" type="0" >
+					</cell>
+					<cell id="11,10" type="0" >
+					</cell>
+					<cell id="11,11" type="0" >
+					</cell>
+					<cell id="11,12" type="0" >
+					</cell>
+					<cell id="11,13" type="0" >
+					</cell>
+					<cell id="11,14" type="0" >
+					</cell>
+					<cell id="11,15" type="0" >
+					</cell>
+					<cell id="11,16" type="0" >
+					</cell>
+					<cell id="11,17" type="0" >
+					</cell>
+					<cell id="11,18" type="0" >
+					</cell>
+					<cell id="11,19" type="0" >
+					</cell>
+					<cell id="11,20" type="0" >
+					</cell>
+					<cell id="11,21" type="0" >
+					</cell>
+					<cell id="11,22" type="0" >
+					</cell>
+					<cell id="11,23" type="0" >
+					</cell>
+					<cell id="11,24" type="0" >
+					</cell>
+					<cell id="11,25" type="0" >
+					</cell>
+					<cell id="11,26" type="0" >
+					</cell>
+					<cell id="11,27" type="0" >
+					</cell>
+					<cell id="11,28" type="0" >
+					</cell>
+					<cell id="11,29" type="0" >
+					</cell>
+					<cell id="11,30" type="0" >
+					</cell>
+					<cell id="11,31" type="0" >
+					</cell>
+					<cell id="11,32" type="0" >
+					</cell>
+					<cell id="11,33" type="0" >
+					</cell>
+					<cell id="11,34" type="0" >
+					</cell>
+					<cell id="11,35" type="0" >
+					</cell>
+					<cell id="11,36" type="0" >
+					</cell>
+					<cell id="11,37" type="0" >
+					</cell>
+					<cell id="11,38" type="0" >
+					</cell>
+					<cell id="11,39" type="0" >
+					</cell>
+					<cell id="11,40" type="0" >
+					</cell>
+					<cell id="11,41" type="0" >
+					</cell>
+					<cell id="11,42" type="0" >
+					</cell>
+					<cell id="11,43" type="0" >
+					</cell>
+					<cell id="11,44" type="0" >
+					</cell>
+					<cell id="11,45" type="0" >
+					</cell>
+					<cell id="11,46" type="0" >
+					</cell>
+					<cell id="11,47" type="0" >
+					</cell>
+					<cell id="11,48" type="0" >
+					</cell>
+					<cell id="11,49" type="0" >
+					</cell>
+					<cell id="11,50" type="0" >
+					</cell>
+					<cell id="11,51" type="0" >
+					</cell>
+					<cell id="11,52" type="0" >
+					</cell>
+					<cell id="11,53" type="0" >
+					</cell>
+					<cell id="11,54" type="0" >
+					</cell>
+					<cell id="11,55" type="0" >
+					</cell>
+					<cell id="11,56" type="0" >
+					</cell>
+					<cell id="11,57" type="0" >
+					</cell>
+					<cell id="11,58" type="0" >
+					</cell>
+					<cell id="11,59" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+					<cell id="12,7" type="0" >
+					</cell>
+					<cell id="12,8" type="0" >
+					</cell>
+					<cell id="12,9" type="0" >
+					</cell>
+					<cell id="12,10" type="0" >
+					</cell>
+					<cell id="12,11" type="0" >
+					</cell>
+					<cell id="12,12" type="0" >
+					</cell>
+					<cell id="12,13" type="0" >
+					</cell>
+					<cell id="12,14" type="0" >
+					</cell>
+					<cell id="12,15" type="0" >
+					</cell>
+					<cell id="12,16" type="0" >
+					</cell>
+					<cell id="12,17" type="0" >
+					</cell>
+					<cell id="12,18" type="0" >
+					</cell>
+					<cell id="12,19" type="0" >
+					</cell>
+					<cell id="12,20" type="0" >
+					</cell>
+					<cell id="12,21" type="0" >
+					</cell>
+					<cell id="12,22" type="0" >
+					</cell>
+					<cell id="12,23" type="0" >
+					</cell>
+					<cell id="12,24" type="0" >
+					</cell>
+					<cell id="12,25" type="0" >
+					</cell>
+					<cell id="12,26" type="0" >
+					</cell>
+					<cell id="12,27" type="0" >
+					</cell>
+					<cell id="12,28" type="0" >
+					</cell>
+					<cell id="12,29" type="0" >
+					</cell>
+					<cell id="12,30" type="0" >
+					</cell>
+					<cell id="12,31" type="0" >
+					</cell>
+					<cell id="12,32" type="0" >
+					</cell>
+					<cell id="12,33" type="0" >
+					</cell>
+					<cell id="12,34" type="0" >
+					</cell>
+					<cell id="12,35" type="0" >
+					</cell>
+					<cell id="12,36" type="0" >
+					</cell>
+					<cell id="12,37" type="0" >
+					</cell>
+					<cell id="12,38" type="0" >
+					</cell>
+					<cell id="12,39" type="0" >
+					</cell>
+					<cell id="12,40" type="0" >
+					</cell>
+					<cell id="12,41" type="0" >
+					</cell>
+					<cell id="12,42" type="0" >
+					</cell>
+					<cell id="12,43" type="0" >
+					</cell>
+					<cell id="12,44" type="0" >
+					</cell>
+					<cell id="12,45" type="0" >
+					</cell>
+					<cell id="12,46" type="0" >
+					</cell>
+					<cell id="12,47" type="0" >
+					</cell>
+					<cell id="12,48" type="0" >
+					</cell>
+					<cell id="12,49" type="0" >
+					</cell>
+					<cell id="12,50" type="0" >
+					</cell>
+					<cell id="12,51" type="0" >
+					</cell>
+					<cell id="12,52" type="0" >
+					</cell>
+					<cell id="12,53" type="0" >
+					</cell>
+					<cell id="12,54" type="0" >
+					</cell>
+					<cell id="12,55" type="0" >
+					</cell>
+					<cell id="12,56" type="0" >
+					</cell>
+					<cell id="12,57" type="0" >
+					</cell>
+					<cell id="12,58" type="0" >
+					</cell>
+					<cell id="12,59" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

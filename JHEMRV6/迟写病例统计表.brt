@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[迟写病例统计表]]></name>
+		<dataSets>
+			<dataSet name="cx3" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select  b.dept_admission_to,e.dept_code,e.dept_name,b.admission_date_time 
+from jhmr_file_index a,pat_visit b,pat_master_index c, 
+DEPT_DICT e WHERE b.admission_date_time>=? and b.admission_date_time<=? and 
+a.PATIENT_ID=b.PATIENT_ID AND a.VISIT_ID=b.VISIT_ID AND a.PATIENT_ID=c.PATIENT_ID AND
+a.create_date_time>a.caption_date_time and e.OUTP_OR_INP=1 and b.dept_admission_to=e.dept_code
+and e.type_code=1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="cx4" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[查询科室名称]]></property>
+				<property name="query"><![CDATA[SELECT dept_name FROM DEPT_DICT  WHERE OUTP_OR_INP=1 and type_code=1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="hospital_name" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select hospital from hospital_config]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2008-01-01</property>
+				<property name="desc">起始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2010-01-01</property>
+				<property name="desc">截止时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="起始时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="截止时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="margin-top">20</property>
+				<property name="margin-bottom">20</property>
+				<property name="printLocation">0</property>
+			</page>
+			<grid row="6" col="3">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">2</property>
+					</row>
+					<row id="2">
+						<property name="type">2</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">50</property>
+					</column>
+					<column id="2">
+						<property name="width">240</property>
+					</column>
+					<column id="3">
+						<property name="width">110</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[=hospital_name.select(HOSPITAL)]]></property>
+						<property name="font-size">16</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[=tostr(year(@start_time))+'年'+tostr(month(@start_time))+'月'+tostr(day(@start_time))+'日'+'至'+tostr(year(@end_time))+'年'+tostr(month(@end_time))+'月'+tostr(day(@end_time))+'日'+'迟写病例统计表']]></property>
+						<property name="font-type">新宋体</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[序号]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[迟写病例数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=&B4]]></property>
+						<property name="ext-left"><![CDATA[B4]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=cx4.group(DEPT_NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=cx3.count(DEPT_NAME=B4)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="6,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[='页次: 第'+pagenumber()+'页/共'+pagecount()+'页']]></property>
+						<property name="bold">0</property>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

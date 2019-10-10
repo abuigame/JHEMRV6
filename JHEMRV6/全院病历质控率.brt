@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="GBK" ?>
+<report version="3.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[全院病历质控率]]></name>
+		<dataSets>
+			<dataSet name="jia" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[质控]]></property>
+				<property name="query"><![CDATA[select b.dept_name, b.dept_code,count(a.mr_quality) as jia
+  from pat_visit a, dept_dict b
+ where a.mr_quality = '1'or a.mr_quality='甲' and a.dept_discharge_from = b.dept_code
+ and a.discharge_date_time>=?
+ and a.discharge_date_time<?+1
+ group by b.dept_name, b.dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="yi" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[ 
+select  b.dept_code, count(a.mr_quality) as yi
+  from pat_visit a, dept_dict b
+ where a.mr_quality = '2' and a.mr_quality='乙'and a.dept_discharge_from = b.dept_code
+ and a.discharge_date_time>=?
+ and a.discharge_date_time<?+1
+ group by  b.dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="bing" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[ select  b.dept_code, count(a.mr_quality) as bing
+  from pat_visit a, dept_dict b
+ where a.mr_quality = '3' or a.mr_quality='丙' and a.dept_discharge_from = b.dept_code
+ and a.discharge_date_time>=?
+ and a.discharge_date_time<?+1
+ group by  b.dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="zong" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select b.dept_code,b.dept_name, count(*) as zong
+  from pat_visit a,dept_dict b
+ where  
+ a.dept_discharge_from=b.dept_code
+ and a.discharge_date_time>=?
+ and a.discharge_date_time<?+1
+ group by b.dept_code,b.dept_name]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select hospital from hospital_config where hospital_no<> '00000000']]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2013-08-01</property>
+				<property name="desc">出院起始时间</property>
+				<property name="source">0</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2013-10-15</property>
+				<property name="desc">出院时间结束时间</property>
+				<property name="source">0</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<subReports/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="printLocation">0</property>
+			</page>
+			<grid row="7" col="8">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">2</property>
+						<property name="height">30</property>
+					</row>
+					<row id="2">
+						<property name="type">2</property>
+						<property name="height">31</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+						<property name="height">30</property>
+					</row>
+					<row id="4">
+						<property name="type">2</property>
+						<property name="height">40</property>
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">50</property>
+					</column>
+					<column id="2">
+						<property name="width">102</property>
+					</column>
+					<column id="3">
+						<property name="width">87</property>
+					</column>
+					<column id="4">
+						<property name="width">75</property>
+					</column>
+					<column id="5">
+						<property name="width">75</property>
+					</column>
+					<column id="6">
+						<property name="width">75</property>
+					</column>
+					<column id="7">
+						<property name="width">75</property>
+					</column>
+					<column id="8">
+						<property name="width">65</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="8" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">16</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="8" >
+						<property name="value"><![CDATA[全院病历质控率]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">18</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="3,1" type="0" colspan="8" >
+						<property name="value"><![CDATA[=tostr(year(@start_time))+'年'+tostr(month(@start_time))+'月'+tostr(day(@start_time))+'日'+'至'+tostr(year(@end_time))+'年'+tostr(month(@end_time))+'月'+tostr(day(@end_time))+'日']]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[序号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[科室编码]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[科别]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[出院病历数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[甲级病历数 >90分]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[乙级病历数 >70分 ]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[丙级病历数 <70分]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[科室病历质控率%]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=row()-4]]></property>
+						<property name="ext-left"><![CDATA[C5]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=zong.select(DEPT_CODE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=zong.select(DEPT_NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=zong.select(ZONG)]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=jia.getone(jia.jiA,jia.dePT_CODE=B5)]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<property name="value"><![CDATA[=yi.getone(yi.yi,yi.dePT_CODE=B5)]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,7" type="0" >
+						<property name="value"><![CDATA[=bing.getone(bing.bING,bing.dePT_CODE=zong.dept_code)]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,8" type="0" >
+						<property name="value"><![CDATA[=(E5+F5+G5)/D5]]></property>
+						<property name="view-format">1|###0.00%;-###0.00%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<property name="value"><![CDATA[总计:]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<property name="value"><![CDATA[=sum(D5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<property name="value"><![CDATA[=sum(E5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<property name="value"><![CDATA[=sum(F5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,7" type="0" >
+						<property name="value"><![CDATA[=sum(G5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,8" type="0" >
+						<property name="value"><![CDATA[=(E6+F6+G6)/D6]]></property>
+						<property name="view-format">1|###0.00%;-###0.00%</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+						<property name="bold">0</property>
+					</cell>
+					<cell id="7,3" type="0" colspan="5" >
+						<property name="value"><![CDATA[='页次: 第'+pagenumber()+'页/共'+pagecount()+'页']]></property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+	<param-form col="2">
+		<ctrl id="start_time" type="1" ctrlType="3" label="出院起始时间">
+		</ctrl>
+		<ctrl id="end_time" type="1" ctrlType="3" label="出院时间结束时间">
+		</ctrl>
+	</param-form>
+</report>

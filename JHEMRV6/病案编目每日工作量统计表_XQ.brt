@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="GBK" ?>
+<report version="3.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病案编目每日工作量统计表]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select hospital from hospital_config where hospital_no<> '00000000']]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_sum" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select  to_char( t.catalog_date,'yyyy-mm-dd') as catalog_date,t.cataloger, count(*) AS PATSUM
+  from REPORT.R_PAT_VISIT t
+ where t.catalog_date >= ?
+   and t.catalog_date <?+1
+   and t.MR_DOCTOR_PART_STATUS=6
+   group by to_char( t.catalog_date,'yyyy-mm-dd'),t.cataloger
+  order  by to_char( t.catalog_date,'yyyy-mm-dd')]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2013-02-01</property>
+				<property name="desc"></property>
+				<property name="source">0</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2014-01-01</property>
+				<property name="desc"></property>
+				<property name="source">0</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<subReports/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+			</page>
+			<grid row="10" col="3">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">43</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">32</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+					</row>
+					<row id="8">
+						<property name="type">4</property>
+					</row>
+					<row id="9">
+						<property name="type">4</property>
+						<property name="height">237</property>
+					</row>
+					<row id="10">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">192</property>
+					</column>
+					<column id="2">
+						<property name="width">223</property>
+					</column>
+					<column id="3">
+						<property name="width">227</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[病案编目工作量统计表]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">18</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[日期]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[姓名]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[数量]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" rowspan="2" >
+						<property name="value"><![CDATA[=ds_sum.group(CATALOG_DATE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_sum.select(CATALOGER)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds_sum.select(PATSUM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[每日小计:]]></property>
+						<property name="background"><![CDATA[204,255,255]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=sum(C4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="font-color"><![CDATA[255,0,0]]></property>
+						<property name="background"><![CDATA[204,255,255]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<property name="value"><![CDATA[="总计: "+count(A4{})+"  天"]]></property>
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<property name="value"><![CDATA[=sum(c5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="font-size">12</property>
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="9,1" type="1" colspan="3" >
+						<property name="value"><![CDATA[<chart><param name="barlabelangle" value="60" /><param name="barlabels" value="=A4{}" /><param name="serieslabels_0" value="工作量" /><param name="titlefont" value="宋体,plain,18" /><param name="legendon" value="true" /><param name="3dmodeon" value="true" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="barlabelson" value="true" /><param name="barlabelfont" value="宋体,plain,11" /><param name="legendfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="inside" /><param name="charttitle" value="每日编目工作量统计表" /><param name="rangelabelson" value="true" /><param name="startangle" value="90" /><param name="valuelabelstyle" value="outside" /><param name="chart" value="bar" /><param name="webtarget_0" value="_blank" /><param name="rangedecimalcount" value="auto" /><param name="background" value="255,255,255" /><param name="bartype" value="side" /><param name="serieslabels" value="工作量" /><param name="percentdecimalcount" value="0" /><param name="sampledecimalcount" value="0" /><param name="3ddepth" value="18" /><param name="samplevalues_0" value="=c5{}" /><param name="seriescount" value="1" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="endangle" value="270" /><param name="sampleaxislabelfont" value="宋体,plain,11" /></chart>]]></property>
+					</cell>
+					<cell id="10,1" type="0" >
+						<property name="value"><![CDATA[=打印时间：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+	<param-form col="2">
+		<ctrl id="start_time" type="1" ctrlType="3" label="">
+		</ctrl>
+		<ctrl id="end_time" type="1" ctrlType="3" label="">
+		</ctrl>
+	</param-form>
+</report>

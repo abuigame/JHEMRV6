@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[安徽省剖宫产手术实施情况统计表]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.*,t2.*
+  from (select max(nvl(decode(t.FM_RSJJ2, '活产', count(*)), 0)) +
+               max(nvl(decode(t.FM_RSJJ2, '', count(*)), 0)) as a
+          from V_产妇分娩信息 t where to_date(t.cf_fmrq,'yyyy-MM-dd hh24:mi') >= ? and  to_date(t.cf_fmrq,'yyyy-MM-dd hh24:mi')  <=? and t.FM_RSJJ1 not in (select FM_RSJJ1 from V_产妇分娩信息 where FM_RSJJ1='3' or FM_RSJJ1='4')
+         group by t.FM_RSJJ2) t1
+  left join (select max(nvl(decode(t.FM_RSJJ2, '活产', count(*)), 0)) +
+                    max(nvl(decode(t.FM_RSJJ2, '', count(*)), 0)) as c
+               from V_产妇分娩信息 t where to_date(t.cf_fmrq,'yyyy-MM-dd hh24:mi') >= ?
+ and  to_date(t.cf_fmrq,'yyyy-MM-dd hh24:mi')  <= ? 
+              and t.topic like '%剖%' and t.FM_RSJJ1 not in (select FM_RSJJ1 from V_产妇分娩信息 where FM_RSJJ1='3' or FM_RSJJ1='4')
+              group by t.FM_RSJJ2) t2 on 1=1]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">开始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+			</page>
+			<grid row="12" col="3">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="height">52</property>
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">180</property>
+					</column>
+					<column id="2">
+						<property name="width">191</property>
+					</column>
+					<column id="3">
+						<property name="width">221</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[安徽省剖宫产手术实施情况统计表]]></property>
+						<property name="font-size">20</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[=tostr(year(@start_date))+'年'+tostr(month(@start_date))+'月'+tostr(day(@start_date))+'日至'+tostr(year(@end_date))+'年'+tostr(month(@end_date))+'月'+tostr(day(@end_date))+'日']]></property>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[累计总活产数]]></property>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[累计剖宫产活产数]]></property>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[剖宫产率（%）]]></property>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(A)]]></property>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(C)]]></property>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=(B4()/A4())]]></property>
+						<property name="view-format">1|###0.##%;-###0.##%</property>
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

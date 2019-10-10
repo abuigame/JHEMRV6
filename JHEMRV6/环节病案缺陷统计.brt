@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[环节病案缺陷统计]]></name>
+		<dataSets>
+			<dataSet name="ba_qx_tj" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[本表为月查询——时间只能输入年和月(禁止输入日期)]]></property>
+				<property name="query"><![CDATA[SELECT t1.GRADING_CLASS_CODE,
+       t1.grading_class_name,
+       count(t1.grading_class_code) AS TOTAL_ERROR
+  FROM jhmr_rectification_item t
+  left join jhinpat_mr_grading_class t1 on t.grading_class_code=t1.grading_class_code
+ where t.qc_confirm_date_time>=? and t.qc_confirm_date_time<? +1
+ GROUP BY t1.GRADING_CLASS_CODE, t1.grading_class_name
+ ORDER BY t1.GRADING_CLASS_CODE, TOTAL_ERROR]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="hospital_name" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select hospital from hospital_config where hospital_no<> '00000000']]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2008-05-01</property>
+				<property name="desc">查询时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2050-10-01</property>
+				<property name="desc">查询时间段</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="查询月份">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="查询时间段">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="printLocation">0</property>
+			</page>
+			<grid row="5" col="4">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">2</property>
+						<property name="height">30</property>
+					</row>
+					<row id="2">
+						<property name="type">2</property>
+						<property name="height">30</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+						<property name="height">40</property>
+					</row>
+					<row id="5">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">50</property>
+					</column>
+					<column id="2">
+						<property name="width">90</property>
+					</column>
+					<column id="3">
+						<property name="width">400</property>
+					</column>
+					<column id="4">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[=hospital_name.select(HOSPITAL)]]></property>
+						<property name="font-size">16</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[环节质控缺陷统计]]></property>
+						<property name="font-size">16</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[序号]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[缺陷分类]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[缺陷名称]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[发生频次]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=&B4]]></property>
+						<property name="ext-left"><![CDATA[B4]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ba_qx_tj.group(GRADING_CLASS_CODE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ba_qx_tj.group(grading_class_name)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ba_qx_tj.select(TOTAL_ERROR)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" colspan="2" >
+						<property name="value"><![CDATA[='页次: 第'+pagenumber()+'页/共'+pagecount()+'页']]></property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

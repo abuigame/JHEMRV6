@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病人平均住院费用统计表(科室)]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_dept" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select tt.strdate,
+       count(*) as pasum,
+       sum(tt.days) / count(*) as avgdays,
+       sum(tt.total_costs) / count(*) as avgcost
+  from (select to_char(p.discharge_date_time, 'yyyy-mm') as strdate,
+               p.dept_discharge_from,
+               (TRUNC(p.discharge_date_time) - TRUNC(p.admission_date_time)) as days,
+               p.total_costs
+          from R_pat_visit p
+         where p.discharge_date_time >= ?
+              
+           and p.discharge_date_time <
+               ? + 1
+           and p.dept_discharge_from = ?) tt
+ group by tt.strdate, tt.dept_discharge_from
+ order by strdate
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="dept_code" />
+			</dataSet>
+			<dataSet name="ds_pats" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select tt.strdate,
+       count(*) as pasum,
+       sum(tt.days) / count(*) as avgdays,
+       sum(tt.total_costs) / count(*) as avgcost
+  from (select to_char(p.discharge_date_time, 'yyyy-mm') as strdate,
+        
+               (TRUNC(p.discharge_date_time) - TRUNC(p.admission_date_time)) as days,
+               p.total_costs
+          from R_pat_visit p
+         where p.discharge_date_time >= ?
+              
+           and p.discharge_date_time <
+               ? + 1
+   ) tt
+ group by tt.strdate
+ order by pasum desc
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_kept_name" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_name from dept_dict t where t.dept_code=?]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="dept_code" />
+			</dataSet>
+			<dataSet name="ds_last" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select tt.strdate,
+       count(*) as pasum,
+       sum(tt.days) / count(*) as avgdays,
+       sum(tt.total_costs) / count(*) as avgcost
+  from (select to_char(p.discharge_date_time, 'yyyy-mm') as strdate,
+               p.dept_discharge_from,
+               (TRUNC(p.discharge_date_time) - TRUNC(p.admission_date_time)) as days,
+               p.total_costs
+          from R_pat_visit p
+         where p.discharge_date_time >=  Add_months(?,-12)
+              
+           and p.discharge_date_time <
+                Add_months(?,-12) + 1
+           and p.dept_discharge_from = ?) tt
+ group by tt.strdate, tt.dept_discharge_from
+ order by strdate
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="dept_code" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-01-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-12-31</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="dept_code" type="6">
+				<property name="dateFormat"></property>
+				<property name="default">300101</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" >
+						<paramCtrl paramId="@dept_code" label="">
+							<ctrl ctrlType="1"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="margin-left">15</property>
+				<property name="margin-right">15</property>
+			</page>
+			<grid row="7" col="5">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">49</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">33</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+						<property name="height">29</property>
+					</row>
+					<row id="5">
+						<property name="height">6</property>
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+						<property name="height">399</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">238</property>
+					</column>
+					<column id="2">
+						<property name="width">168</property>
+					</column>
+					<column id="3">
+						<property name="width">160</property>
+					</column>
+					<column id="4">
+						<property name="width">197</property>
+					</column>
+					<column id="5">
+						<property name="width">181</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="5" >
+						<property name="value"><![CDATA[科室病人平均住院费用统计表]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">18</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[=ds_kept_name.select(DEPT_NAME)]]></property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" colspan="2" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"---"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[月份]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[科室平均住院费用]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[去年同期]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[全院平均住院费用]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[同比水平]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(STRDATE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(AVGCOST)]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds_last.getone(ds_last.avGCOST,todate(ds_last.stRDATE+"-01")=lastyear(todate(a4+"-01")))]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds_pats.getone(ds_pats.aVGCOST,ds_pats.stRDATE=a4)]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="3" >
+						<property name="value"><![CDATA[=B4-C4]]></property>
+						<property name="view"><![CDATA[=CASE(E4>0,icon(BIOS_F58),E4<0,icon(BIOS_F59))]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" colspan="2" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="6,1" type="1" colspan="5" >
+						<property name="value"><![CDATA[<chart><param name="webtarget_2" value="_blank" /><param name="valuelabelson" value="true" /><param name="seriescount" value="3" /><param name="legendon" value="true" /><param name="titlefont" value="宋体,plain,18" /><param name="bartype" value="side" /><param name="valuelineson" value="true" /><param name="webtarget_1" value="_blank" /><param name="webtarget_0" value="_blank" /><param name="rangedecimalcount" value="auto" /><param name="defaultgridlineson" value="true" /><param name="samplehighlighton" value="true,true" /><param name="valuelabelfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="inside" /><param name="sampleaxislabelfont" value="宋体,plain,11" /><param name="percentdecimalcount" value="0" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="barlabels" value="=A4{}" /><param name="startangle" value="90" /><param name="range" value="=round((max(B4{})+1),0)" /><param name="endangle" value="270" /><param name="samplelabelfont" value="宋体,plain,11" /><param name="barlabelfont" value="宋体,plain,11" /><param name="serieslabels" value="科室,去年同期,全院" /><param name="serieslabels_2" value="全院" /><param name="serieslabels_1" value="去年同期" /><param name="legendfont" value="宋体,plain,11" /><param name="serieslabels_0" value="科室" /><param name="rangelabelson" value="true" /><param name="valuelabelstyle" value="outside" /><param name="barlabelson" value="true" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="autolabelspacingon" value="true" /><param name="samplehighlightstyle" value="square,square_filled" /><param name="samplevalues_0" value="=B4{}" /><param name="charttitle" value="科室病人平均住院日统计图" /><param name="baroutlineoff" value="true" /><param name="samplevalues_2" value="=D4{}" /><param name="sampledecimalcount" value="0" /><param name="samplevalues_1" value="=C4{}" /><param name="barlabelangle" value="60" /><param name="background" value="255,255,255" /><param name="chart" value="bar" /><param name="linestroke" value="4,1|0" /><param name="samplelabelangle" value="60" /></chart>]]></property>
+					</cell>
+					<cell id="7,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=打印时间：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

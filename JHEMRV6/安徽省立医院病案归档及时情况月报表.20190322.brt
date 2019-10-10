@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[安徽省立医院病案归档及时情况月报表]]></name>
+		<dataSets>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select (select dept_name
+          from dept_dict
+         where dept_code = dept_discharge_from) dept_discharge_from,
+       count(*) 出院人数,
+       count(case
+               when t.mr_doctor_part_status > 1 then
+                1
+               else
+                null
+             end) 月签收,
+       count(case
+               when trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) = 2 or
+                    trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) < 2 then
+                2
+               else
+                null
+             end) 两日签收,
+       count(case
+               when trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) = 3 or
+                    trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) < 3 then
+                3
+               else
+                null
+             end) 三日签收,
+       count(case
+               when trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) = 5 or
+                    trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) < 5 then
+                5
+               else
+                null
+             end) 五日签收,
+       count(case
+               when trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) = 7 or
+                    trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) < 7 then
+                7
+               else
+                null
+             end) 七日签收,
+       count(case
+               when trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) = 10 or
+                    trunc(t.mr_back_date_time - t.discharge_date_time) -
+                    (select count(*)
+                       from jhmr_mrreceivesignholiday t
+                      where t.holidaydate between (t.discharge_date_time - 1) and
+                            t.mr_back_date_time) < 10 then
+                10
+               else
+                null
+             end) 十日签收
+  from pat_visit t
+ where t.discharge_date_time is not null
+   and t.discharge_date_time between ? and ?+1
+ group by dept_discharge_from
+ order by dept_discharge_from
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="dis_time" />
+				<queryParam name="dis_time2" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="dis_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-02-01</property>
+				<property name="desc">出院时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="dis_time2" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-02-01</property>
+				<property name="desc">出院时间范围</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@dis_time" label="出院时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@dis_time2" label="出院时间范围">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+				<property name="pageDirection">0</property>
+				<property name="printLocation">0</property>
+				<property name="printScale">2</property>
+			</page>
+			<grid row="5" col="14">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+					</row>
+					<row id="2">
+						<property name="type">2</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">235</property>
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+						<property name="width">52</property>
+					</column>
+					<column id="4">
+						<property name="width">52</property>
+					</column>
+					<column id="5">
+						<property name="width">65</property>
+					</column>
+					<column id="6">
+						<property name="width">65</property>
+					</column>
+					<column id="7">
+						<property name="width">65</property>
+					</column>
+					<column id="8">
+						<property name="width">65</property>
+					</column>
+					<column id="9">
+						<property name="width">65</property>
+					</column>
+					<column id="10">
+						<property name="width">65</property>
+					</column>
+					<column id="11">
+						<property name="width">65</property>
+					</column>
+					<column id="12">
+						<property name="width">65</property>
+					</column>
+					<column id="13">
+					</column>
+					<column id="14">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="12" >
+						<property name="value"><![CDATA[=安徽省立医院病案归档及时情况月报表+'('+tostr(year(@dis_time))+'年'+tostr(month(@dis_time))+'月'+')']]></property>
+						<property name="font-size">12</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="1,13" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="1,14" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" rowspan="2" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" colspan="2" >
+						<property name="value"><![CDATA[月总签收情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" colspan="2" >
+						<property name="value"><![CDATA[2个工作日归档情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" colspan="2" >
+						<property name="value"><![CDATA[3个工作日归档情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" colspan="2" >
+						<property name="value"><![CDATA[5个工作日归档情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,11" type="0" colspan="2" >
+						<property name="value"><![CDATA[7个工作日归档情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,13" type="0" colspan="2" >
+						<property name="value"><![CDATA[10个工作日归档情况]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,12" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,13" type="0" >
+						<property name="value"><![CDATA[份数]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,14" type="0" >
+						<property name="value"><![CDATA[比率]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds1.select(DEPT_DISCHARGE_FROM)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="align">0</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds1.select(出院人数)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds1.select(月签收)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=C4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds1.select(两日签收)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=E4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=ds1.select(三日签收)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[=G4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[=ds1.select(五日签收)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[=I4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[=ds1.select(七日签收)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,12" type="0" >
+						<property name="value"><![CDATA[=K4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,13" type="0" >
+						<property name="value"><![CDATA[=ds1.select(十日签收)]]></property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,14" type="0" >
+						<property name="value"><![CDATA[=M4()/B4()]]></property>
+						<property name="view-format">1|###0%;(###0%)</property>
+						<property name="background"><![CDATA[=if(row()%2==0,'255,204,153','255,255,255')]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+					<cell id="5,8" type="0" >
+					</cell>
+					<cell id="5,9" type="0" >
+					</cell>
+					<cell id="5,10" type="0" >
+					</cell>
+					<cell id="5,11" type="0" >
+					</cell>
+					<cell id="5,12" type="0" >
+					</cell>
+					<cell id="5,13" type="0" >
+					</cell>
+					<cell id="5,14" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

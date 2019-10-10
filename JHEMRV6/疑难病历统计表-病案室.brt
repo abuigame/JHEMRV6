@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[疑难病历统计表-病案室]]></name>
+		<dataSets>
+			<dataSet name="ds1" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[文书新建时间]]></property>
+				<property name="query"><![CDATA[            select a.caption_date_time,
+                   a.topic as 文书标题,
+                   a.CREATOR_NAME as 文书创建者,
+                   a.PATIENT_ID as 患者住院号,
+                   a.visit_id as 住院次,
+                   h.name as 患者姓名,
+                   (select dept_name
+                      from dept_dict dd1
+                     where dd1.dept_code = a.dept_code) as 科别,
+                   to_char(i.admission_date_time, 'yyyy-mm-dd hh24:mi:ss') as 入院时间,
+                   to_char(i.discharge_date_time, 'yyyy-mm-dd hh24:mi:ss') as 出院时间,
+                   b.S_VALUE as 主持人,
+                   d.S_VALUE as 记录人,
+                   e.S_VALUE as 参与人员,
+                   f.S_VALUE as 入院诊断,
+                   TO_CHAR(TRIM(replace(g.S_VALUE,
+                                        '双击选择',
+                                        '1900-01-01 00:01'))) AS take_time
+              from JHMR_FILE_INDEX a
+              left join (select S_VALUE, FILE_UNIQUE_ID
+                           from JHCDR_EMR_DATA_ELEMENT
+                          where DE_CODE = 'X.05.000.03') b
+                on a.FILE_UNIQUE_ID = b.FILE_UNIQUE_ID
+              left join (select S_VALUE, FILE_UNIQUE_ID
+                           from JHCDR_EMR_DATA_ELEMENT
+                          where DE_CODE = 'X.01.00.09') c
+                on a.FILE_UNIQUE_ID = c.FILE_UNIQUE_ID
+              left join (select S_VALUE, FILE_UNIQUE_ID
+                           from JHCDR_EMR_DATA_ELEMENT
+                          where DE_CODE = 'X.05.000.04') d
+                on a.FILE_UNIQUE_ID = d.FILE_UNIQUE_ID
+              left join (select S_VALUE, FILE_UNIQUE_ID
+                           from JHCDR_EMR_DATA_ELEMENT
+                          where DE_CODE = 'X.05.000.05') e
+                on a.FILE_UNIQUE_ID = e.FILE_UNIQUE_ID
+              left join (select S_VALUE, FILE_UNIQUE_ID
+                           from JHCDR_EMR_DATA_ELEMENT
+                          where DE_CODE = 'X.05.000.01') f
+                on a.FILE_UNIQUE_ID = f.FILE_UNIQUE_ID
+              left join (select S_VALUE, FILE_UNIQUE_ID
+                           from JHCDR_EMR_DATA_ELEMENT
+                          where DE_CODE = 'X.01.00.09') g
+                on a.FILE_UNIQUE_ID = g.FILE_UNIQUE_ID
+              left join pat_master_index h
+                on a.patient_id = h.patient_id
+              left join pat_visit i
+                on a.patient_id = i.patient_id
+             where a.mr_code IN ('EMR10.00.04_901', 'EMR10.00.04_903')
+               and a.delete_flag = '0'
+               and a.file_flag <> 'T'
+               and (select dept_name
+                      from dept_dict dd
+                     where dd.dept_code = i.dept_discharge_from) like
+                   '%西区%'
+               and i.discharge_date_time between ? and ? +1
+            
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_kept_name" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_name
+  from dept_dict t
+ where t.dept_name like '%西区%'
+   and t.dept_code = ?
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="dept_code" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-01-01</property>
+				<property name="desc">开始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-12-12</property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="dept_code" type="6">
+				<property name="dateFormat"></property>
+				<property name="default"></property>
+				<property name="desc">科室代码</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="开始时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="结束时间">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageDirection">0</property>
+				<property name="add-row">0</property>
+			</page>
+			<grid row="4" col="13">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+						<property name="pageHeader">0</property>
+					</row>
+					<row id="4">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">158</property>
+					</column>
+					<column id="2">
+						<property name="width">106</property>
+					</column>
+					<column id="3">
+						<property name="width">159</property>
+					</column>
+					<column id="4">
+						<property name="width">168</property>
+					</column>
+					<column id="5">
+						<property name="width">152</property>
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+					</column>
+					<column id="11">
+					</column>
+					<column id="12">
+					</column>
+					<column id="13">
+						<property name="width">157</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="13" >
+						<property name="value"><![CDATA[安徽省立医院-总院]]></property>
+						<property name="font-size">16</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="13" >
+						<property name="value"><![CDATA[=tostr(year(@start_time))+'年'+tostr(month(@start_time))+'月'+tostr(day(@start_time))+'日'+'至'+tostr(year(@end_time))+'年'+tostr(month(@end_time))+'月'+tostr(day(@end_time))+'日'+'疑难病历统计表']]></property>
+						<property name="font-size">14</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[文书标题]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[文书创建者]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[讨论时间]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[主持人]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[记录人]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[参与人员]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[患者姓名]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[住院号]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[科别]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[诊断]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[入院时间]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,12" type="0" >
+						<property name="value"><![CDATA[出院时间]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,13" type="0" >
+						<property name="value"><![CDATA[文书标题时间]]></property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds1.select(文书标题)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds1.select(文书创建者)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds1.select(TAKE_TIME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds1.select(主持人)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds1.select(记录人)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=ds1.select(参与人员)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=ds1.select(患者姓名)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[=ds1.select(患者住院号)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[=ds1.select(科别)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[=ds1.select(入院诊断)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[=ds1.select(入院时间)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,12" type="0" >
+						<property name="value"><![CDATA[=ds1.select(出院时间)]]></property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,13" type="0" >
+						<property name="value"><![CDATA[=ds1.select(CAPTION_DATE_TIME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

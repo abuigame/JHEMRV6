@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[各术式病人死亡率统计表]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_dept" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.operation_code, t1.operation_desc, count(*) as patsum
+  from r_pat_visit t,r_operation_doct t1
+ where t.patient_id=t1.patient_id and t.visit_id=t1.visit_id
+ and t.discharge_date_time >=?
+   and t.discharge_date_time <? + 1
+   and t1.operation_type='0'
+   and t1.operation_no=1
+and t.dept_discharge_from in (select dept_code from dept_dict where dept_name like '%南区%')
+ group by t1.operation_code, t1.operation_desc
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_die" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.operation_code, t1.operation_desc, count(*) as patsum
+  from r_pat_visit t,r_operation_doct t1
+ where t.patient_id=t1.patient_id and t.visit_id=t1.visit_id
+ and t.discharge_date_time >=?
+   and t.discharge_date_time < ? + 1
+   and t.discharge_disposition = '死亡'
+   and t1.operation_type='0'
+   and t1.operation_no=1
+and t.dept_discharge_from in (select dept_code from dept_dict where dept_name like '%南区%')
+ group by t1.operation_code, t1.operation_desc]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-10-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-10-31</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+				<property name="margin-left">15</property>
+				<property name="margin-right">15</property>
+				<property name="margin-top">15</property>
+				<property name="margin-bottom">15</property>
+			</page>
+			<grid row="8" col="7">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">47</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">30</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+						<property name="height">24</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+						<property name="type">4</property>
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+						<property name="height">317</property>
+					</row>
+					<row id="8">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">115</property>
+					</column>
+					<column id="2">
+						<property name="width">166</property>
+					</column>
+					<column id="3">
+						<property name="width">67</property>
+					</column>
+					<column id="4">
+						<property name="width">80</property>
+					</column>
+					<column id="5">
+						<property name="width">85</property>
+					</column>
+					<column id="6">
+						<property name="width">76</property>
+					</column>
+					<column id="7">
+						<property name="width">85</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="7" >
+						<property name="value"><![CDATA[各术式病人死亡率统计表]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">16</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" colspan="4" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"---"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="font-size">12</property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[手术编码]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[手术名称]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[手术人数]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[术后死亡人数]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[本术死亡率%]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[死亡总数比%]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[全院死亡率%]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds_die.select(OPERATION_CODE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_die.OPERATION_DESC]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds_dept.getone(ds_dept.pATSUM,ds_dept.oPERATION_CODE=a4)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds_die.PATSUM]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=if(d4!=0,100*d4/c4,null)]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=if(d4!=0,100*d4/d5,null)]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=if(d4!=0,100*d4/c5,null)]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[合计：]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=SUM(C4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=SUM(D4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<property name="bold">0</property>
+						<property name="italic">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,7" type="0" >
+						<property name="value"><![CDATA[=100*D5/C5]]></property>
+						<property name="view-format">1|###0.##;-###0.##</property>
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<property name="bold">0</property>
+						<property name="italic">0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="1" colspan="3" >
+						<property name="value"><![CDATA[<chart><param name="valuelabelson" value="true" /><param name="seriescount" value="2" /><param name="legendon" value="true" /><param name="3ddepth" value="18" /><param name="titlefont" value="宋体,bold,16" /><param name="bartype" value="side" /><param name="valuelineson" value="true" /><param name="webtarget_1" value="_blank" /><param name="webtarget_0" value="_blank" /><param name="rangedecimalcount" value="auto" /><param name="valuelabelfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="inside" /><param name="sampleaxislabelfont" value="宋体,plain,11" /><param name="percentdecimalcount" value="0" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="barlabels" value="=B4{}" /><param name="startangle" value="90" /><param name="3dmodeon" value="true" /><param name="endangle" value="270" /><param name="samplelabelfont" value="宋体,plain,11" /><param name="barlabelfont" value="宋体,plain,11" /><param name="serieslabels" value="手术病人,术后死亡病人" /><param name="serieslabels_1" value="术后死亡病人" /><param name="legendfont" value="宋体,plain,11" /><param name="serieslabels_0" value="手术病人" /><param name="rangelabelson" value="true" /><param name="valuelabelstyle" value="outside" /><param name="barlabelson" value="true" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="autolabelspacingon" value="true" /><param name="charttitle" value="手术病人与术后死亡病人统计图" /><param name="samplevalues_0" value="=C4{}" /><param name="baroutlineoff" value="true" /><param name="sampledecimalcount" value="0" /><param name="barlabelangle" value="60" /><param name="samplevalues_1" value="=D4{}" /><param name="background" value="255,255,255" /><param name="chart" value="bar" /></chart>]]></property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,4" type="1" colspan="4" >
+						<property name="value"><![CDATA[<chart><param name="seriescount" value="1" /><param name="legendon" value="true" /><param name="3ddepth" value="18" /><param name="titlefont" value="宋体,bold,16" /><param name="valuelineson" value="true" /><param name="webtarget_1" value="_blank" /><param name="webtarget_0" value="_blank" /><param name="pielabelson" value="true" /><param name="samplelabels" value="=B4{}" /><param name="rangedecimalcount" value="auto" /><param name="pointinglabelfont" value="宋体,plain,11" /><param name="valuelabelfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="outside" /><param name="sampleaxislabelfont" value="宋体,plain,11" /><param name="percentdecimalcount" value="0" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="percentlabelson" value="true" /><param name="startangle" value="90" /><param name="3dmodeon" value="true" /><param name="serieslabelson" value="false" /><param name="pielabelfont" value="宋体,plain,11" /><param name="endangle" value="270" /><param name="samplelabelfont" value="宋体,plain,11" /><param name="serieslabels" value=" " /><param name="legendfont" value="宋体,plain,11" /><param name="serieslabels_0" value=" " /><param name="rangelabelson" value="true" /><param name="valuelabelstyle" value="outside" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="insidelabelfont" value="宋体,plain,11" /><param name="autolabelspacingon" value="true" /><param name="outsidelabelfont" value="宋体,plain,11" /><param name="samplevalues_0" value="=D4{}" /><param name="charttitle" value="术后死亡术式比例图" /><param name="baroutlineoff" value="true" /><param name="sampledecimalcount" value="0" /><param name="background" value="255,255,255" /><param name="chart" value="pie" /></chart>]]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="8,1" type="0" colspan="3" >
+						<property name="value"><![CDATA[=打印时间：+tostr(now(),'yyyy-mm-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

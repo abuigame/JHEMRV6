@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[手术室统计]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select 
+
+ distinct d.operating_room_no,
+       nvl(a.术者例数,0) 术者例数,
+       nvl(a1.一级手术例数,0) 一级手术例数,
+       nvl(a2.二级手术例数,0) 二级手术例数,
+       nvl(a3.三级手术例数,0) 三级手术例数,
+       nvl(a4.四级手术例数,0) 四级手术例数,
+       nvl(a5.非计划再次手术例数,0) 非计划再次手术例数,
+       nvl(c.麻醉例数,0) 麻醉例数,
+nvl(c1.全身麻醉例数,0) 全身麻醉例数,
+nvl(c2.硬膜外麻醉例数,0) 硬膜外麻醉例数,
+nvl(c3.局部麻醉例数,0) 局部麻醉例数
+  from operation d
+  left join (select operating_room_no as dept, count(*) as 术者例数
+               from operation t where t.operation_desc not like  '%平产%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no ) and t.operating_date between ? and ?+1
+              group by t.operating_room_no) a on a.dept = d.operating_room_no
+  left join (select operating_room_no as dept, count(*) as 一级手术例数
+               from operation t
+              where  t.operation_desc not like  '%平产%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no) and operating_grade = '一级手术'  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) a1 on a1.dept=d.operating_room_no
+  left join (select operating_room_no as dept, count(*) as 二级手术例数
+               from operation t
+              where  t.operation_desc not like  '%平产%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no) and operating_grade = '二级手术'  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) a2 on a2.dept=d.operating_room_no
+  left join (select  operating_room_no as dept, count(*) as 三级手术例数
+               from operation t
+              where  t.operation_desc not like  '%平产%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no) and operating_grade = '三级手术'  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) a3 on a3.dept=d.operating_room_no
+  left join (select  operating_room_no as dept, count(*) as 四级手术例数
+               from operation t
+              where  t.operation_desc not like  '%平产%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no) and operating_grade = '四级手术'  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) a4 on a4.dept=d.operating_room_no
+  left join (select  operating_room_no as dept, count(*) as 非计划再次手术例数
+               from operation t
+              where  t.operation_desc not like  '%平产%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no) and t.reoperation_plan = '1'  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) a5 on a5.dept=d.operating_room_no
+  left join (select  operating_room_no as dept, count(*) as 麻醉例数
+               from operation t  where  t.operation_desc not like  '%平产%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no) and t.operating_date between ? and ?+1
+              group by t.operating_room_no) c on c.dept=d.operating_room_no
+  left join (select operating_room_no as dept, count(*) as 全身麻醉例数
+               from operation t 
+              where t.anaesthesia_method like '%全%' and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no)  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) c1 on c1.dept=d.operating_room_no
+  left join (select operating_room_no as dept, count(*) as 硬膜外麻醉例数
+               from operation t 
+              where t.anaesthesia_method like '%硬膜%'and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no)  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) c2 on c2.dept=d.operating_room_no
+  left join (select t.operating_room_no as dept,
+                    count(*) as 局部麻醉例数
+               from operation t
+              where  t.anaesthesia_method not like '%全%'
+                and t.anaesthesia_method not like '%硬膜%'and t.patient_id in (select patient_id from JHMR_FILE_INDEX_VS_OPERATION where patient_id=t.patient_id and operation_no=t.operation_no) and t.anaesthesia_method is not null  and t.operating_date between ? and ?+1
+              group by t.operating_room_no) c3  on c3.dept=d.operating_room_no
+              where  d.operating_room_no is not null and d.operating_room_no not like 'X%' AND d.operating_room_no NOT LIKE 'N%' and d.operating_room_no not like '门%' and d.operating_room_no not like '微%'
+ order by d.operating_room_no]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+				<queryParam name="start_date" />
+				<queryParam name="end_date" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-10-01</property>
+				<property name="desc">开始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_date" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2015-10-30</property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+			</page>
+			<grid row="12" col="11">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+					</column>
+					<column id="4">
+					</column>
+					<column id="5">
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+					</column>
+					<column id="9">
+					</column>
+					<column id="10">
+					</column>
+					<column id="11">
+						<property name="width">180</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="11" >
+						<property name="value"><![CDATA[手术室统计-安徽省立医院]]></property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="11" >
+						<property name="value"><![CDATA[=tostr(year(@start_date))+'年'+tostr(month(@start_date))+'月'+tostr(day(@start_date))+'日'+'至'+tostr(year(@end_date))+'年'+tostr(month(@end_date))+'月'+tostr(day(@end_date))+'日']]></property>
+						<property name="align">2</property>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[手术室]]></property>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[手术例数]]></property>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[一级手术例数]]></property>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[二级手术例数]]></property>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[三级手术例数]]></property>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[四级手术例数]]></property>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[非计划再次手术例数]]></property>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[麻醉例数]]></property>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[全身麻醉例数]]></property>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[硬膜外麻醉例数]]></property>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[局部麻醉例数]]></property>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(OPERATING_ROOM_NO)]]></property>
+						<property name="ext-direction">3</property>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(术者例数)]]></property>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(一级手术例数)]]></property>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(二级手术例数)]]></property>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds.select(三级手术例数)]]></property>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=ds.select(四级手术例数)]]></property>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=ds.select(非计划再次手术例数)]]></property>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[=ds.select(麻醉例数)]]></property>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[=ds.select(全身麻醉例数)]]></property>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[=ds.select(硬膜外麻醉例数)]]></property>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[=ds.select(局部麻醉例数)]]></property>
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+					<cell id="5,8" type="0" >
+					</cell>
+					<cell id="5,9" type="0" >
+					</cell>
+					<cell id="5,10" type="0" >
+					</cell>
+					<cell id="5,11" type="0" >
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="6,5" type="0" >
+					</cell>
+					<cell id="6,6" type="0" >
+					</cell>
+					<cell id="6,7" type="0" >
+					</cell>
+					<cell id="6,8" type="0" >
+					</cell>
+					<cell id="6,9" type="0" >
+					</cell>
+					<cell id="6,10" type="0" >
+					</cell>
+					<cell id="6,11" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="7,7" type="0" >
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+					<cell id="7,9" type="0" >
+					</cell>
+					<cell id="7,10" type="0" >
+					</cell>
+					<cell id="7,11" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+					<cell id="8,8" type="0" >
+					</cell>
+					<cell id="8,9" type="0" >
+					</cell>
+					<cell id="8,10" type="0" >
+					</cell>
+					<cell id="8,11" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="9,5" type="0" >
+					</cell>
+					<cell id="9,6" type="0" >
+					</cell>
+					<cell id="9,7" type="0" >
+					</cell>
+					<cell id="9,8" type="0" >
+					</cell>
+					<cell id="9,9" type="0" >
+					</cell>
+					<cell id="9,10" type="0" >
+					</cell>
+					<cell id="9,11" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="10,7" type="0" >
+					</cell>
+					<cell id="10,8" type="0" >
+					</cell>
+					<cell id="10,9" type="0" >
+					</cell>
+					<cell id="10,10" type="0" >
+					</cell>
+					<cell id="10,11" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+					<cell id="11,5" type="0" >
+					</cell>
+					<cell id="11,6" type="0" >
+					</cell>
+					<cell id="11,7" type="0" >
+					</cell>
+					<cell id="11,8" type="0" >
+					</cell>
+					<cell id="11,9" type="0" >
+					</cell>
+					<cell id="11,10" type="0" >
+					</cell>
+					<cell id="11,11" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+					<cell id="12,7" type="0" >
+					</cell>
+					<cell id="12,8" type="0" >
+					</cell>
+					<cell id="12,9" type="0" >
+					</cell>
+					<cell id="12,10" type="0" >
+					</cell>
+					<cell id="12,11" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

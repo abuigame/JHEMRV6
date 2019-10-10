@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病人二次手术统计表]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_all" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select aa.inp_no,
+               aa.name,
+               aa.sex,
+               aa.age,
+               aa.admission_date_time,
+               aa.discharge_date_time,
+               aa.dept_name,
+               aa.diagnosis_desc,
+               aa.operation_desc,
+               aa.STRoperating_date,
+               aa.STROPERATING_END_DATE,
+               aa.discharge_disposition,
+               aa.operation_code,
+               ROW_NUMBER() OVER(PARTITION BY aa.STRoperating_date, aa.inp_no ORDER BY aa.inp_no DESC) ROWNO
+          from (select distinct t2.patient_id,
+                                t2.visit_id,
+                                t2.discharge_disposition,
+                                '0009' || t3.inp_no as inp_no,
+                                t3.name,
+                                t3.sex,
+                                t2.age,
+                                t2.admission_date_time,
+                                t2.discharge_date_time,
+                                t6.dept_name,
+                                t4.diagnosis_desc,
+                                t7.operation_desc,
+                                t7.operation_code,
+                                t7.operation_no,
+                                to_char(t7.operating_date,
+                                        'YYYY-MM-DD HH24:MI:SS') AS STRoperating_date,
+                                to_char(t7.OPERATING_END_DATE,
+                                        'YYYY-MM-DD HH24:MI:SS') AS STROPERATING_END_DATE,t2.catalog_date
+                  from r_pat_visit t2,
+                       r_pat_master_index t3,
+                       r_diagnosis_doct t4,
+                       (select t1.patient_id, t1.visit_id, count(*)
+                          from (select t.patient_id,
+                                       t.visit_id,
+                                       o.operating_date,
+                                       count(*)
+                                  from r_pat_visit t, r_operation_doct o
+                                 where t.discharge_date_time >=
+                                     ?
+                                   and t.discharge_date_time <
+                                     ? + 1
+                                   and t.patient_id = o.patient_id
+                                   and t.visit_id = o.visit_id
+                                   and o.operation_type = '0'
+                                 group by t.patient_id,
+                                          t.visit_id,
+                                          o.operating_date) t1
+                         group by t1.patient_id, t1.visit_id
+                        having count(t1.patient_id) > 1) t5,
+                       dept_dict t6,
+                       r_operation_doct t7
+                 where t5.patient_id = t2.patient_id
+                   and t5.visit_id = t2.visit_id
+                   and t2.patient_id = t3.patient_id
+                   and t2.patient_id = t4.patient_id
+                   and t2.visit_id = t4.visit_id
+                   and t2.patient_id = t7.patient_id
+                   and t2.visit_id = t7.visit_id
+                   and t2.dept_discharge_from = t6.dept_code 
+                   and t2.dept_discharge_from in (select dept_code from dept_dict where type_code='1')
+                   and t4.diagnosis_type = 3
+                   and t4.diagnosis_no = 1
+                   and t7.operation_type = '0'
+                 order by t3.name) aa
+         group by aa.inp_no,
+                  aa.name,
+                  aa.name,
+                  aa.sex,
+                  aa.age,
+                  aa.admission_date_time,
+                  aa.discharge_date_time,
+                  aa.dept_name,
+                  aa.diagnosis_desc,
+                  aa.STRoperating_date,
+                  aa.STROPERATING_END_DATE,
+                   aa.discharge_disposition,
+                   aa.operation_no,
+               aa.operation_code,
+                  aa.operation_desc,
+                    aa.catalog_date
+                  order by  aa.dept_name, aa.name, aa.operation_no
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-09-10</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-10-10</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">36</property>
+				<property name="pageColNum">20</property>
+				<property name="pageDirection">0</property>
+				<property name="margin-left">10</property>
+				<property name="margin-right">10</property>
+			</page>
+			<grid row="5" col="13">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">44</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">30</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+						<property name="height">28</property>
+					</row>
+					<row id="4">
+						<property name="height">34</property>
+					</row>
+					<row id="5">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="type">0</property>
+						<property name="width">73</property>
+					</column>
+					<column id="2">
+						<property name="type">0</property>
+						<property name="width">66</property>
+					</column>
+					<column id="3">
+						<property name="type">0</property>
+						<property name="width">37</property>
+					</column>
+					<column id="4">
+						<property name="type">0</property>
+						<property name="width">34</property>
+					</column>
+					<column id="5">
+						<property name="width">98</property>
+					</column>
+					<column id="6">
+						<property name="width">88</property>
+					</column>
+					<column id="7">
+						<property name="width">110</property>
+					</column>
+					<column id="8">
+						<property name="width">87</property>
+					</column>
+					<column id="9">
+						<property name="width">81</property>
+					</column>
+					<column id="10">
+						<property name="width">126</property>
+					</column>
+					<column id="11">
+						<property name="width">88</property>
+					</column>
+					<column id="12">
+						<property name="width">166</property>
+					</column>
+					<column id="13">
+						<property name="width">154</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="13" >
+						<property name="value"><![CDATA[病人二次手术统计表]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">16</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,8" type="0" >
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" colspan="5" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"---"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[病案号]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[患者姓名]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[性别]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[年龄]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[入院日期]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[出院科室]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[出院日期]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[离院方式]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[疾病名称]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[手术名称]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[手术编码]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,12" type="0" >
+						<property name="value"><![CDATA[手术开始时间]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,13" type="0" >
+						<property name="value"><![CDATA[手术结束时间]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(INP_NO)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="merge-same">1</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(NAME)]]></property>
+						<property name="merge-same">1</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(SEX)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(AGE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(ADMISSION_DATE_TIME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(DEPT_NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(DISCHARGE_DATE_TIME)]]></property>
+						<property name="merge-same">2</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[=ds_all.DISCHARGE_DISPOSITION]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(DIAGNOSIS_DESC)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(OPERATION_DESC)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[=ds_all.OPERATION_CODE]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,12" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(STROPERATING_DATE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,13" type="0" >
+						<property name="value"><![CDATA[=ds_all.select(STROPERATING_END_DATE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" colspan="4" >
+						<property name="value"><![CDATA[=打印时间：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+					<cell id="5,8" type="0" >
+					</cell>
+					<cell id="5,9" type="0" >
+					</cell>
+					<cell id="5,10" type="0" >
+					</cell>
+					<cell id="5,11" type="0" >
+					</cell>
+					<cell id="5,12" type="0" >
+					</cell>
+					<cell id="5,13" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

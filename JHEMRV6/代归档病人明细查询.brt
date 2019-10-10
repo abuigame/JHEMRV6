@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[代归档病人明细查询]]></name>
+		<dataSets>
+			<dataSet name="db" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT case
+         when T2.first_page_submit_date is null and
+              T2.first_page_print_date is null and
+              T2.catalog_date =
+              TO_DATE('1990-01-01 ', 'YYYY-MM-DD HH24:MI:SS') then
+          '未提交'
+         when T2.first_page_submit_date is not null and
+              T2.first_page_print_date is null and
+              T2.catalog_date =
+              TO_DATE('1990-01-01 ', 'YYYY-MM-DD HH24:MI:SS') then
+          '已提交'
+         when T2.first_page_submit_date is not null and
+              T2.first_page_print_date is null and
+              T2.catalog_date >
+              TO_DATE('1990-01-01 ', 'YYYY-MM-DD HH24:MI:SS') then
+          '可打印'
+         when T2.first_page_print_date is not null then
+          '已打印'
+       end as first_page_status,
+       to_char(T2.FIRST_PAGE_SUBMIT_DATE, 'yyyy-mm-dd hh24:mi:ss') as FIRST_PAGE_SUBMIT_DATE,
+       T2.FIRST_PAGE_SUBMIT_USER_ID,
+       (SELECT USER_NAME FROM USERS WHERE T3.HOUSE_MAN_ID = USER_ID) AS HOUSE_MAN_NAME,
+       to_char(T2.ADMISSION_DATE_TIME, 'yyyy-mm-dd hh24:mi:ss') as ADMISSION_DATE_TIME,
+       T1.CHARGE_TYPE,
+       T1.NAME,
+       T1.SEX,
+       T1.DATE_OF_BIRTH,
+       T2.INP_NO,
+       to_char(T2.DISCHARGE_DATE_TIME, 'yyyy-mm-dd hh24:mi:ss') as DISCHARGE_DATE_TIME,
+       T2.BED_LABEL,
+       T2.PATIENT_ID,
+       T2.VISIT_ID,
+       T2.DISCHARGE_DISPOSITION,
+       T2.DOCTOR_IN_CHARGE,
+       T2.MR_SCORE,
+       T2.CP_STATUS,
+       T2.CP_NAME,
+       T2.TOTAL_COSTS
+  FROM PAT_MASTER_INDEX T1, PAT_VISIT T2, JHINPAT_MR_ON_LINE T3
+ WHERE T1.HOSPITAL_NO = T2.HOSPITAL_NO
+   AND T2.HOSPITAL_NO = T3.HOSPITAL_NO
+   AND T1.HOSPITAL_NO = '485000307'
+   AND T1.PATIENT_ID = T2.PATIENT_ID
+   AND T2.PATIENT_ID = T3.PATIENT_ID
+   AND T2.VISIT_ID = T3.VISIT_ID
+   AND T3.DOCTOR_OR_NURSER_FLAG = 0
+   AND T2.DEPT_DISCHARGE_FROM = T3.DEPT_CODE
+   AND (T2.MR_DOCTOR_PART_STATUS < 3)
+   AND T2.DEPT_DISCHARGE_FROM = ?
+UNION ALL
+SELECT case
+         when T2.first_page_submit_date is null and
+              T2.first_page_print_date is null and
+              T2.catalog_date =
+              TO_DATE('1990-01-01 ', 'YYYY-MM-DD HH24:MI:SS') then
+          '未提交'
+         when T2.first_page_submit_date is not null and
+              T2.first_page_print_date is null and
+              T2.catalog_date =
+              TO_DATE('1990-01-01 ', 'YYYY-MM-DD HH24:MI:SS') then
+          '已提交'
+         when T2.first_page_submit_date is not null and
+              T2.first_page_print_date is null and
+              T2.catalog_date >
+              TO_DATE('1990-01-01 ', 'YYYY-MM-DD HH24:MI:SS') then
+          '可打印'
+         when T2.first_page_print_date is not null then
+          '已打印'
+       end as first_page_status,
+       to_char(T2.FIRST_PAGE_SUBMIT_DATE, 'yyyy-mm-dd hh24:mi:ss') as FIRST_PAGE_SUBMIT_DATE,
+       T2.FIRST_PAGE_SUBMIT_USER_ID,
+       (SELECT USER_NAME FROM USERS WHERE T3.HOUSE_MAN_ID = USER_ID) AS HOUSE_MAN_NAME,
+       to_char(T2.ADMISSION_DATE_TIME, 'yyyy-mm-dd hh24:mi:ss') as ADMISSION_DATE_TIME,
+       T1.CHARGE_TYPE,
+       T1.NAME,
+       T1.SEX,
+       T1.DATE_OF_BIRTH,
+       T2.INP_NO,
+       to_char(T2.DISCHARGE_DATE_TIME, 'yyyy-mm-dd hh24:mi:ss') as DISCHARGE_DATE_TIME, 
+       T2.BED_LABEL,
+       T2.PATIENT_ID,
+       T2.VISIT_ID,
+       T2.DISCHARGE_DISPOSITION,
+       T2.DOCTOR_IN_CHARGE,
+       T2.MR_SCORE,
+       T2.CP_STATUS,
+       T2.CP_NAME,
+       T2.TOTAL_COSTS
+  FROM PAT_MASTER_INDEX T1, PAT_VISIT T2, JHINPAT_MR_ON_LINE_LOG T3
+ WHERE T1.HOSPITAL_NO = T2.HOSPITAL_NO
+   AND T2.HOSPITAL_NO = T3.HOSPITAL_NO
+   AND T1.HOSPITAL_NO = '485000307'
+   AND T1.PATIENT_ID = T2.PATIENT_ID
+   AND T2.PATIENT_ID = T3.PATIENT_ID
+   AND T2.VISIT_ID = T3.VISIT_ID
+   AND T3.DOCTOR_OR_NURSER_FLAG = 0
+   AND T2.DEPT_DISCHARGE_FROM = T3.DEPT_CODE
+   AND (sysdate <= T2.MR_RETURN_DATE OR
+       sysdate <= T2.MEDICAL_MATTER_RETURN_DATE)
+   AND T2.DEPT_DISCHARGE_FROM = ?
+   AND T3.LOG_USER_ID <> 'IEService'
+ ORDER BY DISCHARGE_DATE_TIME DESC
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="dept_code" />
+				<queryParam name="dept_code" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="dept_code" type="6">
+				<property name="dateFormat"></property>
+				<property name="default"></property>
+				<property name="desc">科室代码</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+			</page>
+			<grid row="12" col="12">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="height">32</property>
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+					</row>
+					<row id="7">
+					</row>
+					<row id="8">
+					</row>
+					<row id="9">
+					</row>
+					<row id="10">
+					</row>
+					<row id="11">
+					</row>
+					<row id="12">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+					</column>
+					<column id="2">
+					</column>
+					<column id="3">
+					</column>
+					<column id="4">
+						<property name="width">97</property>
+					</column>
+					<column id="5">
+						<property name="width">88</property>
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+						<property name="width">136</property>
+					</column>
+					<column id="9">
+						<property name="width">140</property>
+					</column>
+					<column id="10">
+					</column>
+					<column id="11">
+					</column>
+					<column id="12">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="12" >
+						<property name="value"><![CDATA[代归档病人明细查询]]></property>
+						<property name="font-size">12</property>
+						<property name="bold">0</property>
+						<border type="0">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[住院号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[病案号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="value"><![CDATA[首页状态]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<property name="value"><![CDATA[首页提交日期]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<property name="value"><![CDATA[首页提交人]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<property name="value"><![CDATA[姓名]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" >
+						<property name="value"><![CDATA[性别]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,8" type="0" >
+						<property name="value"><![CDATA[入院日期]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" >
+						<property name="value"><![CDATA[出院日期]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,10" type="0" >
+						<property name="value"><![CDATA[总费用]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,11" type="0" >
+						<property name="value"><![CDATA[医疗付费方式]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,12" type="0" >
+						<property name="value"><![CDATA[出院床号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[=db.select(PATIENT_ID)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[=db.select(INP_NO)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[=db.select(FIRST_PAGE_STATUS)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[=db.select(FIRST_PAGE_SUBMIT_DATE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[=db.select(FIRST_PAGE_SUBMIT_USER_ID)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[=db.select(NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[=db.select(SEX)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[=db.select(ADMISSION_DATE_TIME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[=db.select(DISCHARGE_DATE_TIME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[=db.select(TOTAL_COSTS)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[=db.select(CHARGE_TYPE)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,12" type="0" >
+						<property name="value"><![CDATA[=db.select(BED_LABEL)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[总人次：]]></property>
+					</cell>
+					<cell id="4,2" type="0" colspan="4" >
+						<property name="value"><![CDATA[=count(A3{})]]></property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="4,6" type="0" colspan="2" >
+						<property name="value"><![CDATA[（按出院日期排序）]]></property>
+					</cell>
+					<cell id="4,8" type="0" >
+					</cell>
+					<cell id="4,9" type="0" >
+					</cell>
+					<cell id="4,10" type="0" >
+					</cell>
+					<cell id="4,11" type="0" >
+					</cell>
+					<cell id="4,12" type="0" >
+					</cell>
+					<cell id="5,1" type="0" >
+					</cell>
+					<cell id="5,2" type="0" >
+					</cell>
+					<cell id="5,3" type="0" >
+					</cell>
+					<cell id="5,4" type="0" >
+					</cell>
+					<cell id="5,5" type="0" >
+					</cell>
+					<cell id="5,6" type="0" >
+					</cell>
+					<cell id="5,7" type="0" >
+					</cell>
+					<cell id="5,8" type="0" >
+					</cell>
+					<cell id="5,9" type="0" >
+					</cell>
+					<cell id="5,10" type="0" >
+					</cell>
+					<cell id="5,11" type="0" >
+					</cell>
+					<cell id="5,12" type="0" >
+					</cell>
+					<cell id="6,1" type="0" >
+					</cell>
+					<cell id="6,2" type="0" >
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="6,5" type="0" >
+					</cell>
+					<cell id="6,6" type="0" >
+					</cell>
+					<cell id="6,7" type="0" >
+					</cell>
+					<cell id="6,8" type="0" >
+					</cell>
+					<cell id="6,9" type="0" >
+					</cell>
+					<cell id="6,10" type="0" >
+					</cell>
+					<cell id="6,11" type="0" >
+					</cell>
+					<cell id="6,12" type="0" >
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="7,7" type="0" >
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+					<cell id="7,9" type="0" >
+					</cell>
+					<cell id="7,10" type="0" >
+					</cell>
+					<cell id="7,11" type="0" >
+					</cell>
+					<cell id="7,12" type="0" >
+					</cell>
+					<cell id="8,1" type="0" >
+					</cell>
+					<cell id="8,2" type="0" >
+					</cell>
+					<cell id="8,3" type="0" >
+					</cell>
+					<cell id="8,4" type="0" >
+					</cell>
+					<cell id="8,5" type="0" >
+					</cell>
+					<cell id="8,6" type="0" >
+					</cell>
+					<cell id="8,7" type="0" >
+					</cell>
+					<cell id="8,8" type="0" >
+					</cell>
+					<cell id="8,9" type="0" >
+					</cell>
+					<cell id="8,10" type="0" >
+					</cell>
+					<cell id="8,11" type="0" >
+					</cell>
+					<cell id="8,12" type="0" >
+					</cell>
+					<cell id="9,1" type="0" >
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+					<cell id="9,3" type="0" >
+					</cell>
+					<cell id="9,4" type="0" >
+					</cell>
+					<cell id="9,5" type="0" >
+					</cell>
+					<cell id="9,6" type="0" >
+					</cell>
+					<cell id="9,7" type="0" >
+					</cell>
+					<cell id="9,8" type="0" >
+					</cell>
+					<cell id="9,9" type="0" >
+					</cell>
+					<cell id="9,10" type="0" >
+					</cell>
+					<cell id="9,11" type="0" >
+					</cell>
+					<cell id="9,12" type="0" >
+					</cell>
+					<cell id="10,1" type="0" >
+					</cell>
+					<cell id="10,2" type="0" >
+					</cell>
+					<cell id="10,3" type="0" >
+					</cell>
+					<cell id="10,4" type="0" >
+					</cell>
+					<cell id="10,5" type="0" >
+					</cell>
+					<cell id="10,6" type="0" >
+					</cell>
+					<cell id="10,7" type="0" >
+					</cell>
+					<cell id="10,8" type="0" >
+					</cell>
+					<cell id="10,9" type="0" >
+					</cell>
+					<cell id="10,10" type="0" >
+					</cell>
+					<cell id="10,11" type="0" >
+					</cell>
+					<cell id="10,12" type="0" >
+					</cell>
+					<cell id="11,1" type="0" >
+					</cell>
+					<cell id="11,2" type="0" >
+					</cell>
+					<cell id="11,3" type="0" >
+					</cell>
+					<cell id="11,4" type="0" >
+					</cell>
+					<cell id="11,5" type="0" >
+					</cell>
+					<cell id="11,6" type="0" >
+					</cell>
+					<cell id="11,7" type="0" >
+					</cell>
+					<cell id="11,8" type="0" >
+					</cell>
+					<cell id="11,9" type="0" >
+					</cell>
+					<cell id="11,10" type="0" >
+					</cell>
+					<cell id="11,11" type="0" >
+					</cell>
+					<cell id="11,12" type="0" >
+					</cell>
+					<cell id="12,1" type="0" >
+					</cell>
+					<cell id="12,2" type="0" >
+					</cell>
+					<cell id="12,3" type="0" >
+					</cell>
+					<cell id="12,4" type="0" >
+					</cell>
+					<cell id="12,5" type="0" >
+					</cell>
+					<cell id="12,6" type="0" >
+					</cell>
+					<cell id="12,7" type="0" >
+					</cell>
+					<cell id="12,8" type="0" >
+					</cell>
+					<cell id="12,9" type="0" >
+					</cell>
+					<cell id="12,10" type="0" >
+					</cell>
+					<cell id="12,11" type="0" >
+					</cell>
+					<cell id="12,12" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

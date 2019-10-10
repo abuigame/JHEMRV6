@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[病人再入院统计表]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_dept" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_discharge_from  as dept_code,a.dept_name , count(*) as pasum,a.display_order
+  from REPORT.R_PAT_VISIT t,dept_dict a
+ where  t.discharge_date_time >= ?
+   and t.discharge_date_time <?+1
+   and t.dept_discharge_from =a.dept_code
+and a.dept_name not like '%南区%'
+    group by t.dept_discharge_from,a.dept_name,a.display_order
+  order by a.display_order
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_c" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select ppp.dept_code, count(*) as pasum
+  from (select pp.dept_discharge_from as dept_code,pp.patient_id, count(*) as pasum
+  from (select p.patient_id,
+              p.visit_id,
+              p.discharge_date_time,
+               p.dept_discharge_from
+          from R_pat_visit p,
+               (select t.patient_id,
+                       t.visit_id,
+                       t.admission_date_time,
+                       t.discharge_date_time,
+                       t.dept_discharge_from
+                  from R_pat_visit t
+                 where t.discharge_date_time>=?
+                 
+and t.discharge_date_time<?+1
+
+) a
+         where p.discharge_date_time>=?
+and p.discharge_date_time<?+1
+        
+           and p.patient_id = a.patient_id
+           and p.visit_id <> a.visit_id
+           and p.visit_id=a.visit_id+1
+
+           and trunc(p.admission_date_time) - trunc(a.discharge_date_time )<= ?
+           and p.admission_date_time - a.discharge_date_time > 0) pp
+ where pp.dept_discharge_from in (select dept_code from dept_dict where dept_name like '%南区%')group by pp.patient_id , pp.dept_discharge_from)ppp
+ group by ppp.dept_code
+  
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="days" />
+			</dataSet>
+			<dataSet name="ds_e" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select tt.dept_discharge_from as dept_code, count(*) as patsum
+  from (select t.patient_id, t.dept_discharge_from, count(*)
+          from R_PAT_VISIT t
+         where  t.discharge_date_time>=?
+                 
+and t.discharge_date_time<?+1
+and t.dept_discharge_from in (select dept_code from dept_dict where dept_name like '%南区%')
+         group by t.patient_id, t.dept_discharge_from
+        having count(t.patient_id) > 1) tt
+ group by tt.dept_discharge_from]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_d" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select pp.dept_discharge_from as dept_code, count(*) as pasum
+  from (select p.patient_id,
+               p.visit_id,
+               p.admission_date_time,
+               p.discharge_date_time,
+               p.dept_discharge_from
+          from R_pat_visit p,
+               (select t.patient_id,
+                       t.visit_id,
+                       t.admission_date_time,
+                       t.discharge_date_time,
+                       t.dept_discharge_from
+                  from R_pat_visit t
+                 where t.discharge_date_time >
+                       ?
+                   and t.discharge_date_time <
+                       ?+1) a
+         where p.discharge_date_time > ?
+           and p.discharge_date_time < ?+1
+and p.dept_discharge_from in (select dept_code from dept_dict where dept_name like '%南区%')
+           and p.patient_id = a.patient_id
+           and p.visit_id <> a.visit_id
+ and p.visit_id=a.visit_id+1
+
+
+           and trunc(p.admission_date_time) - trunc(a.discharge_date_time) <= ?
+           and p.admission_date_time - a.discharge_date_time > 0) pp
+ group by pp.dept_discharge_from]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="days" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-09-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-10-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="days" type="17">
+				<property name="dateFormat"></property>
+				<property name="default">3</property>
+				<property name="desc">间隔天数</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" >
+						<paramCtrl paramId="@days" label="间隔天数">
+							<ctrl ctrlType="1"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+			</page>
+			<grid row="6" col="6">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">48</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+						<property name="type">4</property>
+						<property name="height">26</property>
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">134</property>
+					</column>
+					<column id="2">
+						<property name="width">88</property>
+					</column>
+					<column id="3">
+						<property name="width">89</property>
+					</column>
+					<column id="4">
+						<property name="width">100</property>
+					</column>
+					<column id="5">
+						<property name="width">96</property>
+					</column>
+					<column id="6">
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="6" >
+						<property name="value"><![CDATA[病人再入院统计表]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">16</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" colspan="3" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"---"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[多次出院人数]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[多次出院次数]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[重复入院次数]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[间隔天数]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(DEPT_NAME)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(PASUM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<property name="value"><![CDATA[=ds_c.getone(ds_c.pASUM,ds_c.dEPT_CODE=ds_dept.dept_code)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[=ds_d.getone(ds_d.pASUM,ds_d.dEPT_CODE=ds_dept.dept_code)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[=ds_e.getone(ds_e.pATSUM,ds_e.dePT_CODE=ds_dept.dept_code)]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[=@days]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[总计：]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=sum(B4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<property name="value"><![CDATA[=sum(C4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=sum(D4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=sum(E4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=打印日期：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="6,3" type="0" >
+					</cell>
+					<cell id="6,4" type="0" >
+					</cell>
+					<cell id="6,5" type="0" >
+					</cell>
+					<cell id="6,6" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

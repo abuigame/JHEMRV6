@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[医院感染,伤口愈合分科统计表]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[SELECT T.HOSPITAL FROM HOSPITAL_CONFIG T WHERE T.HOSPITAL_NO <>'00000000'OR T.HOSPITAL_TYPE IS NOT NULL]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_dept" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_discharge_from  as dept_code, a.dept_code as code,a.dept_name , count(*) as pasum, a.display_order
+  from R_PAT_VISIT t,dept_dict a
+ where  t.discharge_date_time >= ?
+   and t.discharge_date_time <?+1
+    and t.dept_discharge_from = a.dept_code 
+   group by t.dept_discharge_from,a.dept_name,a.dept_code,a.display_order
+  order by a.display_order
+  ]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_e" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t1.dept_code,count(*) as pasum FROM(select distinct  T.patient_id    ,t.dept_discharge_from as dept_code
+  from PAT_VISIT t, R_DIAGNOSIS_DOCT d, diagnosis_dict dic
+ where t.discharge_date_time >= ?
+   and t.discharge_date_time <?+1
+   and t.patient_id = d.patient_id
+   and t.visit_id = d.visit_id
+  and d.diagnosis_type=3
+   and d.diagnosis_code = dic.diagnosis_code
+   and dic.diagnosis_name  like '%感染%'
+and oper_treat_indicator1='无')t1
+ group by t1.dept_code]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_h" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_discharge_from  AS dept_code, count(*) AS patsum
+  from R_OPERATION_DOCT o, R_pat_visit t
+ where t.discharge_date_time >=?
+   and t.discharge_date_time <?+ 1
+   and t.patient_id = o.patient_id
+   and t.visit_id = o.visit_id
+   and  o.wound_grade_heal like 'Ⅰ%'
+   and o.operation_type='0'
+   AND O.OPERATION_NO=1
+ group by t.dept_discharge_from]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_i" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_discharge_from  AS dept_code, count(*) AS patsum
+  from R_OPERATION_DOCT o, R_pat_visit t
+ where t.discharge_date_time >=?
+   and t.discharge_date_time <?+ 1
+   and t.patient_id = o.patient_id
+   and t.visit_id = o.visit_id
+   and  o.wound_grade_heal like '%Ⅰ/甲%'
+   and o.operation_type='0'
+ AND O.OPERATION_NO=1
+ group by t.dept_discharge_from]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_k" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.dept_discharge_from  AS dept_code, count(*) AS patsum
+  from R_OPERATION_DOCT o, R_pat_visit t
+ where t.discharge_date_time >=?
+   and t.discharge_date_time <?+ 1
+   and t.patient_id = o.patient_id
+   and t.visit_id = o.visit_id
+   and  o.wound_grade_heal like 'Ⅰ/丙%'
+   and o.operation_type='0'
+ AND O.OPERATION_NO=1
+ group by t.dept_discharge_from]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-09-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2012-10-01</property>
+				<property name="desc"></property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<query-form>
+			<formProps />
+			<query-grid row="2" col="2">
+				<rows>
+				<rc idx="1"  size="25" />
+				<rc idx="2"  size="25" />
+				</rows>
+				<cols>
+				<rc idx="1"  size="150" />
+				<rc idx="2"  size="150" />
+				</cols>
+				<cells>
+					<cell r="1" c="1" >
+						<paramCtrl paramId="@start_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="1" c="2" >
+						<paramCtrl paramId="@end_time" label="">
+							<ctrl ctrlType="7"><ctrlProps/></ctrl>
+						</paramCtrl>
+					</cell>
+					<cell r="2" c="1" af="0" >
+					</cell>
+					<cell r="2" c="2" >
+						<btn action="0" text="查  询">
+						</btn>
+					</cell>
+				</cells>
+			</query-grid>
+		</query-form>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+			</page>
+			<grid row="7" col="12">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">50</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">26</property>
+					</row>
+					<row id="3">
+						<property name="type">2</property>
+					</row>
+					<row id="4">
+						<property name="type">2</property>
+						<property name="height">34</property>
+					</row>
+					<row id="5">
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">77</property>
+					</column>
+					<column id="2">
+						<property name="width">157</property>
+					</column>
+					<column id="3">
+						<property name="width">14</property>
+					</column>
+					<column id="4">
+						<property name="width">47</property>
+					</column>
+					<column id="5">
+						<property name="width">49</property>
+					</column>
+					<column id="6">
+						<property name="width">47</property>
+					</column>
+					<column id="7">
+						<property name="width">13</property>
+					</column>
+					<column id="8">
+						<property name="width">45</property>
+					</column>
+					<column id="9">
+						<property name="width">43</property>
+					</column>
+					<column id="10">
+						<property name="width">48</property>
+					</column>
+					<column id="11">
+						<property name="width">48</property>
+					</column>
+					<column id="12">
+						<property name="width">52</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="12" >
+						<property name="value"><![CDATA[医院感染、伤口愈合全院分科统计表]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+						<property name="bold">0</property>
+					</cell>
+					<cell id="2,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">16</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,8" type="0" colspan="5" >
+						<property name="value"><![CDATA[=统计时间：+tostr(@start_time,'yyyy-MM-dd')+"---"+tostr(@end_time,'yyyy-MM-dd')]]></property>
+						<property name="align">2</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" rowspan="2" >
+						<property name="value"><![CDATA[科室编码]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" rowspan="2" >
+						<property name="value"><![CDATA[科室名称]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" colspan="3" >
+						<property name="value"><![CDATA[医院感染统计]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" colspan="5" >
+						<property name="value"><![CDATA[I类切口愈合情况统计]]></property>
+						<property name="background"><![CDATA[='192,192,192']]></property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,4" type="0" >
+						<property name="value"><![CDATA[出院人数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,5" type="0" >
+						<property name="value"><![CDATA[感染人数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,6" type="0" >
+						<property name="value"><![CDATA[[%]]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,8" type="0" >
+						<property name="value"><![CDATA[I类切口总数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,9" type="0" >
+						<property name="value"><![CDATA[其中I甲切口数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,10" type="0" >
+						<property name="value"><![CDATA[[%]]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,11" type="0" >
+						<property name="value"><![CDATA[其中I丙切口数]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,12" type="0" >
+						<property name="value"><![CDATA[[%]]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(CODE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(DEPT_NAME)]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,4" type="0" >
+						<property name="value"><![CDATA[=ds_dept.select(PASUM)]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,5" type="0" >
+						<property name="value"><![CDATA[=ds_e.getone(ds_e.pASUM,ds_e.dEPT_CODE=ds_dept.dept_code)]]></property>
+						<property name="view"><![CDATA[=map(list(null),list(0))]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,6" type="0" >
+						<property name="value"><![CDATA[=(E5{})/(D5{})*100]]></property>
+						<property name="view"><![CDATA[=map(list(null),list(0.00))]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,7" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,8" type="0" >
+						<property name="value"><![CDATA[=ds_h.GEtone(ds_h.PATSUM,ds_h.dePT_CODE=ds_dept.dept_code)]]></property>
+						<property name="view"><![CDATA[=map(list(null),list(0))]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,9" type="0" >
+						<property name="value"><![CDATA[=ds_i.getone(ds_i.pATSUM,ds_i.dEPT_CODE=ds_dept.dept_code)]]></property>
+						<property name="view"><![CDATA[=map(list(null),list(0))]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,10" type="0" >
+						<property name="value"><![CDATA[=(I5{}/H5{})*100]]></property>
+						<property name="view"><![CDATA[=map(list(null),list(0.00))]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,11" type="0" >
+						<property name="value"><![CDATA[=ds_k.getone(ds_k.pATSUM,ds_k.dEPT_CODE=ds_dept.dept_code)]]></property>
+						<property name="view"><![CDATA[=map(list(null),list(0))]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,12" type="0" >
+						<property name="value"><![CDATA[=(K5{}/H5{})*100]]></property>
+						<property name="view"><![CDATA[=map(list(null),list(0.00))]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<property name="value"><![CDATA[总    计：]]></property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,3" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,4" type="0" >
+						<property name="value"><![CDATA[=sum(D5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,5" type="0" >
+						<property name="value"><![CDATA[=sum(E5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,6" type="0" >
+						<property name="value"><![CDATA[=100*E6{}/D6{}]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,7" type="0" >
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,8" type="0" >
+						<property name="value"><![CDATA[=sum(H5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,9" type="0" >
+						<property name="value"><![CDATA[=sum(I5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,10" type="0" >
+						<property name="value"><![CDATA[=(I6/H6)*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,11" type="0" >
+						<property name="value"><![CDATA[=sum(K5{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,12" type="0" >
+						<property name="value"><![CDATA[=(K6/H6)*100]]></property>
+						<property name="view-format">1|###0.00;-###0.00</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[=打印日期：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="7,3" type="0" >
+					</cell>
+					<cell id="7,4" type="0" >
+					</cell>
+					<cell id="7,5" type="0" >
+					</cell>
+					<cell id="7,6" type="0" >
+					</cell>
+					<cell id="7,7" type="0" >
+					</cell>
+					<cell id="7,8" type="0" >
+					</cell>
+					<cell id="7,9" type="0" >
+					</cell>
+					<cell id="7,10" type="0" >
+					</cell>
+					<cell id="7,11" type="0" >
+					</cell>
+					<cell id="7,12" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>

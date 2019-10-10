@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="GBK" ?>
+<report version="3.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[编目人员每日工作量统计]]></name>
+		<dataSets>
+			<dataSet name="hospital" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select t.hospital from HOSPITAL_CONFIG t where HOSPITAL_NO='40068980X4']]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+			</dataSet>
+			<dataSet name="ds_sum" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select  to_char( t.catalog_date,'yyyy-mm-dd') as catalog_date,t.cataloger, count(*) AS PATSUM
+  from R_PAT_VISIT t
+ where t.catalog_date >= ?
+   and t.catalog_date <?+1
+   and t.MR_DOCTOR_PART_STATUS=6
+   group by to_char( t.catalog_date,'yyyy-mm-dd'),t.cataloger
+  order  by to_char( t.catalog_date,'yyyy-mm-dd')]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+			<dataSet name="ds_cataloger" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select  distinct t.cataloger
+  from R_PAT_VISIT t
+ where t.catalog_date >= ?
+   and t.catalog_date <?+1
+   and t.MR_DOCTOR_PART_STATUS=6
+  ]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2013-02-01</property>
+				<property name="desc"></property>
+				<property name="source">0</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default">2014-01-01</property>
+				<property name="desc"></property>
+				<property name="source">0</property>
+			</parameter>
+		</parameters>
+		<variables/>
+		<subReports/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="paginateType">0</property>
+			</page>
+			<grid row="9" col="2">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="type">1</property>
+						<property name="height">43</property>
+					</row>
+					<row id="2">
+						<property name="type">1</property>
+						<property name="height">32</property>
+					</row>
+					<row id="3">
+						<property name="pageHeader">0</property>
+					</row>
+					<row id="4">
+					</row>
+					<row id="5">
+						<property name="type">4</property>
+					</row>
+					<row id="6">
+						<property name="type">4</property>
+					</row>
+					<row id="7">
+						<property name="type">4</property>
+					</row>
+					<row id="8">
+						<property name="type">4</property>
+						<property name="height">268</property>
+					</row>
+					<row id="9">
+						<property name="type">4</property>
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">164</property>
+					</column>
+					<column id="2">
+						<property name="width">78</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="2" >
+						<property name="value"><![CDATA[病案编目人员工作量统计]]></property>
+						<property name="font-type">楷体_GB2312</property>
+						<property name="font-size">20</property>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[=hospital.select(HOSPITAL)]]></property>
+						<property name="font-type">华文行楷</property>
+						<property name="font-size">18</property>
+						<property name="align">0</property>
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[=ds_cataloger.select(CATALOGER)]]></property>
+						<property name="ext-direction">2</property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,1" type="0" >
+						<property name="value"><![CDATA[=ds_sum.group(CATALOG_DATE)]]></property>
+						<property name="ext-direction">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="4,2" type="0" >
+						<property name="value"><![CDATA[=ds_sum.getone(ds_sum.pATSUM,ds_sum.caTALOGER=b3 and ds_sum.cATALOG_DATE=a4)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,1" type="0" >
+						<property name="value"><![CDATA[="合计: "+count(A4{})+"  天"]]></property>
+						<property name="background"><![CDATA[204,255,255]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="5,2" type="0" >
+						<property name="value"><![CDATA[=sum(b4{})]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="background"><![CDATA[204,255,255]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,1" type="0" >
+						<property name="value"><![CDATA[总计：]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="6,2" type="0" >
+						<property name="value"><![CDATA[=B5]]></property>
+						<property name="view-format">1|###0;-###0</property>
+						<property name="font-color"><![CDATA[0,0,255]]></property>
+						<property name="background"><![CDATA[192,192,192]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="7,1" type="0" >
+					</cell>
+					<cell id="7,2" type="0" >
+					</cell>
+					<cell id="8,1" type="1" colspan="2" >
+						<property name="value"><![CDATA[<chart><param name="barlabelangle" value="60" /><param name="serieslabels_0" value="=B3{}" /><param name="titlefont" value="宋体,plain,18" /><param name="legendon" value="true" /><param name="rangelabelfont" value="宋体,plain,11" /><param name="legendfont" value="宋体,plain,11" /><param name="percentlabelstyle" value="inside" /><param name="samplelabelangle" value="60" /><param name="charttitle" value="编目人员每日工作量统计图" /><param name="rangelabelson" value="true" /><param name="webtarget_2" value="_blank" /><param name="startangle" value="90" /><param name="valuelabelstyle" value="outside" /><param name="sampleaxislabelangle" value="180" /><param name="webtarget_1" value="_blank" /><param name="chart" value="line" /><param name="samplelabelson" value="true" /><param name="webtarget_0" value="_blank" /><param name="valuelineson" value="true" /><param name="linestroke" value="4" /><param name="rangedecimalcount" value="auto" /><param name="background" value="255,255,255" /><param name="bartype" value="behind" /><param name="serieslabels" value="=B3{}" /><param name="percentdecimalcount" value="0" /><param name="samplehighlighton" value="true" /><param name="samplelabels" value="=A4{}" /><param name="sampledecimalcount" value="0" /><param name="samplevalues_0" value="=B4{B3=@bios_series}" /><param name="seriescount" value="1" /><param name="valuelabelson" value="true" /><param name="defaultgridlineson" value="true" /><param name="rangeaxislabelfont" value="宋体,plain,11" /><param name="samplehighlightstyle" value="circle" /><param name="endangle" value="270" /><param name="sampleaxislabelfont" value="宋体,plain,16" /><param name="samplelabelfont" value="宋体,plain,11" /></chart>]]></property>
+					</cell>
+					<cell id="9,1" type="0" >
+						<property name="value"><![CDATA[=打印时间：+tostr(now(),'yyyy-MM-dd')]]></property>
+						<property name="align">0</property>
+					</cell>
+					<cell id="9,2" type="0" >
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+	<param-form col="2">
+		<ctrl id="start_time" type="1" ctrlType="3" label="">
+		</ctrl>
+		<ctrl id="end_time" type="1" ctrlType="3" label="">
+		</ctrl>
+	</param-form>
+</report>

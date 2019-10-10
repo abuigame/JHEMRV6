@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<report version="5.0">
+	<head>
+		<property name="type">0</property>
+		<name><![CDATA[诊疗工作量统计表]]></name>
+		<dataSets>
+			<dataSet name="ds" type="DB_SQL" >
+				<property name="dataSource">JHEMR_DS</property>
+				<property name="desc"><![CDATA[]]></property>
+				<property name="query"><![CDATA[select uu.user_id,uu.user_name as 姓名,dd.dept_name as 科室,jzsds.接诊数,wzsds.危重数,bwsds.病危数,bzsds.病重数,qjsds.抢救数,cfsds.查房次数,cftsds.查房天数,zjcfds.周均查房次数 as 周均查房次数 from users uu left join (select d.dept_name as 科室,a.user_id as 工号,b.user_name as 姓名,a.接诊数 from (
+select t.user_id,count(*) as 接诊数 from (select u.user_dept,u.user_id,p.patient_id from USERS u  left join pat_visit p on (p.chief_doctor_id=u.user_id or p.attending_doctor_id=u.user_id or p.doctor_in_charge_id=u.user_id）where  p.discharge_date_time>? and p.discharge_date_time<?) t where t.patient_id is not null  group by (t.user_id)
+) a left join users b on a.user_id=b.user_id left join dept_dict d on b.user_dept=d.dept_code order by d.dept_code asc ) jzsds on uu.user_id=jzsds.工号 left join (select t.user_id as 工号,count(*) as 危重数 from (select distinct u.user_dept,u.user_id,p.patient_id from USERS u  left join pat_visit p on (p.chief_doctor_id=u.user_id or p.attending_doctor_id=u.user_id or p.doctor_in_charge_id=u.user_id） 
+left join JHCDR_INPAT_ORDER o on p.patient_id=o.patient_id where (o.order_text  like '%病危%' or o.order_text  like '%病重%')  and o.stop_date_time>? and o.stop_date_time<?
+) t where t.patient_id is not null group by (t.user_id)) wzsds on uu.user_id=wzsds.工号 left join (select t.user_id as 工号,count(*) as 病危数 from (select distinct u.user_dept,u.user_id,p.patient_id from USERS u  left join pat_visit p on (p.chief_doctor_id=u.user_id or p.attending_doctor_id=u.user_id or p.doctor_in_charge_id=u.user_id） 
+left join JHCDR_INPAT_ORDER o on p.patient_id=o.patient_id where o.order_text  like '%病危%'  and o.stop_date_time>? and o.stop_date_time<?
+) t where t.patient_id is not null group by (t.user_id))bwsds on uu.user_id=bwsds.工号 left join (select t.user_id as 工号,count(*) as 病重数 from (select distinct u.user_dept,u.user_id,p.patient_id from USERS u  left join pat_visit p on (p.chief_doctor_id=u.user_id or p.attending_doctor_id=u.user_id or p.doctor_in_charge_id=u.user_id） 
+left join JHCDR_INPAT_ORDER o on p.patient_id=o.patient_id where  o.order_text  like '%病重%'  and o.stop_date_time>? and o.stop_date_time<?
+) t where t.patient_id is not null group by (t.user_id))bzsds on uu.user_id=bzsds.工号  left join (select t.user_id as 工号,count(*) as 抢救数 from (select u.user_dept,u.user_id,mr.patient_id,mr.file_name from USERS u   left join JHMR_FILE_INDEX mr on u.user_id=mr.creator_id where mr.mr_class='EMR10.00.08' and mr.caption_date_time>? and mr.caption_date_time<?
+) t where t.patient_id is not null group by (t.user_id)) qjsds on uu.user_id=qjsds.工号 left join (select t.user_id as 工号,count(*) as 查房次数 from (select u.user_dept,u.user_id,mr.patient_id,mr.file_name,mr.caption_date_time from USERS u   left join JHMR_FILE_INDEX mr on (u.user_id=mr.creator_id or u.user_id=mr.topic_doctor_id) where mr.mr_class='EMR10.00.02' or mr.mr_class='EMR10.00.03'
+) t where t.caption_date_time>? and t.caption_date_time<? group by (t.user_id)) cfsds on uu.user_id=cfsds.工号 left join (select t.userid as 工号,count(*) as 查房天数 from (select distinct * from (
+select u.user_dept,u.user_id as userid,substr(mr.caption_date_time,0,10) as captime from USERS u   left join JHMR_FILE_INDEX mr on (u.user_id=mr.creator_id or u.user_id=mr.topic_doctor_id) where (mr.mr_class='EMR10.00.02' or mr.mr_class='EMR10.00.03') and mr.caption_date_time>? and mr.caption_date_time<?
+) cfts) t  group by (t.userid)) cftsds on uu.user_id=cftsds.工号 left join (select t.user_id as 工号,ceil(7*count(*)/(?-?)) as 周均查房次数 from (select u.user_dept,u.user_id,mr.patient_id,mr.file_name,mr.caption_date_time from USERS u   left join JHMR_FILE_INDEX mr on (u.user_id=mr.creator_id or u.user_id=mr.topic_doctor_id) where mr.mr_class='EMR10.00.02' or mr.mr_class='EMR10.00.03'
+) t where t.caption_date_time>? and t.caption_date_time<? group by (t.user_id)) zjcfds on uu.user_id=zjcfds.工号 left join dept_dict dd on uu.user_dept=dd.dept_code where uu.user_id<>'000000' and uu.user_id<>'JHEMR' order by dd.dept_code asc
+
+]]></property>
+				<property name="beginRow">0</property>
+				<property name="endRow">0</property>
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+				<queryParam name="end_time" />
+				<queryParam name="start_time" />
+				<queryParam name="start_time" />
+				<queryParam name="end_time" />
+			</dataSet>
+		</dataSets>
+		<parameters>
+			<parameter name="start_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">起始时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+			<parameter name="end_time" type="2">
+				<property name="dateFormat">yyyy-MM-dd</property>
+				<property name="default"></property>
+				<property name="desc">结束时间</property>
+				<property name="valueCalc">false</property>
+			</parameter>
+		</parameters>
+		<variables/>
+	</head>
+	<body>
+		<sheet id="sheet1">
+			<page>
+				<property name="pageRowNum">42</property>
+				<property name="printLocation">0</property>
+			</page>
+			<grid row="3" col="11">
+				<properties>
+				</properties>
+				<rows>
+					<row id="1">
+						<property name="height">38</property>
+					</row>
+					<row id="2">
+					</row>
+					<row id="3">
+					</row>
+				</rows>
+				<columns>
+					<column id="1">
+						<property name="width">124</property>
+					</column>
+					<column id="2">
+						<property name="width">80</property>
+					</column>
+					<column id="3">
+						<property name="width">95</property>
+					</column>
+					<column id="4">
+						<property name="width">66</property>
+					</column>
+					<column id="5">
+						<property name="width">66</property>
+					</column>
+					<column id="6">
+					</column>
+					<column id="7">
+					</column>
+					<column id="8">
+						<property name="width">66</property>
+					</column>
+					<column id="9">
+						<property name="width">66</property>
+					</column>
+					<column id="10">
+						<property name="width">66</property>
+					</column>
+					<column id="11">
+						<property name="width">98</property>
+					</column>
+				</columns>
+				<cells>
+					<cell id="1,1" type="0" colspan="10" >
+						<property name="value"><![CDATA[诊疗工作量统计表]]></property>
+						<property name="font-size">18</property>
+						<property name="bold">0</property>
+						<border type="1">1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1;1:0,0,0:1</border>
+					</cell>
+					<cell id="1,11" type="0" >
+						<border type="1">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,1" type="0" >
+						<property name="value"><![CDATA[科 室]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,2" type="0" >
+						<property name="value"><![CDATA[工 号]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,3" type="0" >
+						<property name="value"><![CDATA[姓 名]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,4" type="0" >
+						<property name="value"><![CDATA[诊治人次]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,5" type="0" >
+						<property name="value"><![CDATA[危重人数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,6" type="0" >
+						<property name="value"><![CDATA[病危人数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,7" type="0" >
+						<property name="value"><![CDATA[病重人数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,8" type="0" >
+						<property name="value"><![CDATA[抢救病人]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,9" type="0" >
+						<property name="value"><![CDATA[查房次数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,10" type="0" >
+						<property name="value"><![CDATA[查房天数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="2,11" type="0" >
+						<property name="value"><![CDATA[周均查房次数]]></property>
+						<property name="bold">0</property>
+						<property name="background"><![CDATA[153,153,153]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,1" type="0" >
+						<property name="value"><![CDATA[=ds.select(科室)]]></property>
+						<property name="ext-direction">3</property>
+						<property name="size-adjust">3</property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="2">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,2" type="0" >
+						<property name="value"><![CDATA[=ds.select(USER_ID)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,3" type="0" >
+						<property name="value"><![CDATA[=ds.select(姓名)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,4" type="0" >
+						<property name="value"><![CDATA[=ds.select(接诊数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,5" type="0" >
+						<property name="value"><![CDATA[=ds.select(危重数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,6" type="0" >
+						<property name="value"><![CDATA[=ds.select(病危数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,7" type="0" >
+						<property name="value"><![CDATA[=ds.select(病重数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,8" type="0" >
+						<property name="value"><![CDATA[=ds.select(抢救数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,9" type="0" >
+						<property name="value"><![CDATA[=ds.select(查房次数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,10" type="0" >
+						<property name="value"><![CDATA[=ds.select(查房天数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+					<cell id="3,11" type="0" >
+						<property name="value"><![CDATA[=ds.select(周均查房次数)]]></property>
+						<border type="1">1:0,0,0:1</border>
+						<border type="3">1:0,0,0:1</border>
+					</cell>
+				</cells>
+			</grid>
+		</sheet>
+	</body>
+</report>
